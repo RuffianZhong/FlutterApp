@@ -1,0 +1,68 @@
+name: flutter_wan_android
+description: A Flutter project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# 版本号：外部版本号 + 内部协议版本号
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+# 项目依赖：三方库依赖
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 系统widget国际化支持
+  flutter_localizations:
+    sdk: flutter
+
+  # 创建项目自带
+  cupertino_icons: ^1.0.2
+
+  # dio网络库
+  dio: ^4.0.6
+  # 键盘可见性
+  flutter_keyboard_visibility: ^5.3.0
+  # 异步库
+  async: ^2.8.2
+  # 本地配置数据存储
+  shared_preferences: ^2.0.15
+  # 文件读写(文件夹路径)
+  path_provider: ^2.0.11
+  # sqlite数据库
+  sqflite: ^2.0.2+1
+  # 图片加载库
+  cached_network_image: ^3.2.1
+  # Toast库
+  fluttertoast: ^8.0.9
+  # 屏幕适配工具
+  flutter_screenutil: ^5.5.3+2
+  # Flutter WebView
+  flutter_inappwebview: ^5.4.3+7
+  # 数据共享
+  provider: ^6.0.3
+
+
+# 开发依赖
+dev_dependencies:
+  # 创建项目自带
+  flutter_test:
+    sdk: flutter
+  # 创建项目自带
+  flutter_lints: ^2.0.0
+
+
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # 创建项目自带
+  uses-material-design: true
+
+# 本地化
+flutter_intl:
+  enabled: true
