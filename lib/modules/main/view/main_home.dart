@@ -1,13 +1,14 @@
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/utils/log_util.dart';
 import 'package:provider/provider.dart';
-
+import 'dart:async';
 import '../../../core/lifecycle/zt_lifecycle.dart';
 import '../../../generated/l10n.dart';
 import '../../../res/color_res.dart';
 import '../../../utils/screen_util.dart';
+import '../../../widget/banner_widget.dart';
 
 List<String> imageUrl = [
   "https://img2.baidu.com/it/u=1994380678,3283034272&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657213200&t=d57830e0ca280cc0f87fdbf10b25305b",
@@ -41,31 +42,26 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
   }
 
   Widget bodyContent() {
-    EasyRefreshController? controller = EasyRefreshController();
+    EasyRefreshController controller = EasyRefreshController();
+
     return EasyRefresh(
-      controller: controller,
       child: CustomScrollView(
         slivers: [
           SliverAppBarWidget(),
           SliverListWidget(),
         ],
       ),
+      controller: controller,
       onRefresh: () async {
         await Future.delayed(Duration(seconds: 2), () {
-          if (mounted) {
-            setState(() {
-              controller.finishRefresh();
-            });
-          }
+          //controller.callRefresh();
+          // controller.finishRefresh();
         });
       },
       onLoad: () async {
         await Future.delayed(Duration(seconds: 2), () {
-          if (mounted) {
-            setState(() {
-              controller.finishLoad();
-            });
-          }
+          //   controller.callLoad();
+          //  controller.finishLoad();
         });
       },
     );
@@ -119,9 +115,7 @@ class _SliverAppBarWidgetState extends State<SliverAppBarWidget> {
         return FlexibleSpaceBar(
           centerTitle: true,
           title: shrinkAnimatedOpacity(const Text("Flutter")),
-          /* background: ImageHelper.load(imageUrl[0], fit: BoxFit.fitWidth),*/
-
-          background: banner(),
+          background: bannerWidget(),
         );
       }),
 
@@ -141,137 +135,8 @@ class _SliverAppBarWidgetState extends State<SliverAppBarWidget> {
         child: child);
   }
 
-  Widget banner() {
-    return BannerWidget();
-  }
-}
-
-class BannerWidget extends StatefulWidget {
-  const BannerWidget({Key? key}) : super(key: key);
-
-  @override
-  State<BannerWidget> createState() => _BannerWidgetState();
-}
-
-class _BannerWidgetState extends State<BannerWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return bannerWidget();
-  }
-
   Widget bannerWidget() {
-    return Stack(
-      children: [
-        ///banner
-        Positioned(child: pageView()),
-
-        ///指示器
-        Align(alignment: Alignment.bottomCenter, child: indicator())
-      ],
-    );
-  }
-
-  ///pageView
-  Widget pageView() {
-    return Consumer<BannerViewModel>(builder: (context, viewModel, child) {
-      int dataSize = viewModel.dataArray.length;
-
-      return PageView.builder(
-        controller: viewModel.controller,
-        itemBuilder: (BuildContext context, int index) {
-          // Logger.log("----index:$index====:${viewModel.dataArray.length}");
-
-          if (dataSize > 0) {
-            int newIndex = index % dataSize;
-
-            return ImageHelper.load(viewModel.dataArray[newIndex],
-                fit: BoxFit.fitWidth);
-          } else {
-            return Container();
-          }
-        },
-        onPageChanged: (int index) {
-          Logger.log("----index:$index====:${viewModel.dataArray.length}");
-
-          if (dataSize > 0) {
-            int newIndex = index % dataSize;
-            viewModel.indicatorValue = newIndex;
-          }
-
-          if (index == 0 || index == viewModel.loopCount - 1) {
-            viewModel.resetLoop();
-          }
-        },
-        // itemCount: viewModel.dataArray.length,
-        itemCount: viewModel.loopCount,
-      );
-    });
-  }
-
-  ///指示器
-  Widget indicator() {
-    return Consumer<BannerViewModel>(builder: (context, viewModel, child) {
-      return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: indicatorChild(viewModel));
-    });
-  }
-
-  ///指示器子控件
-  List<Widget> indicatorChild(BannerViewModel viewModel) {
-    List<Widget> children = [];
-
-    for (int i = 0; i < viewModel.dataArray.length; i++) {
-      children.add(Container(
-        padding: const EdgeInsets.all(1),
-        child: Icon(
-          Icons.circle,
-          size: 10,
-          color:
-              viewModel.indicatorValue == i ? ColorRes.themeMain : Colors.grey,
-        ),
-      ));
-    }
-    return children;
-  }
-}
-
-///BannerViewModel
-class BannerViewModel extends ChangeNotifier {
-  ///循环数量
-  final int loopCount = 10;
-
-  ///指示器下标
-  int _indicatorValue = 0;
-
-  ///banner数据列表
-  List _dataArray = [];
-
-  ///控制器
-  PageController controller = PageController();
-
-  int get indicatorValue => _indicatorValue;
-
-  set indicatorValue(int value) {
-    _indicatorValue = value;
-    notifyListeners();
-  }
-
-  List get dataArray => _dataArray;
-
-  set dataArray(List value) {
-    _dataArray = value;
-    resetLoop();
-    notifyListeners();
-  }
-
-  void resetLoop() {
-    //取整
-    int minIndex = loopCount ~/ 2;
-    //减去不能整除的差值
-    minIndex = minIndex - minIndex % _dataArray.length;
-    //定位到中间
-    controller.jumpToPage(minIndex);
+    return const BannerWidget();
   }
 }
 
@@ -289,7 +154,7 @@ class _SliverListWidgetState extends State<SliverListWidget> {
     return SliverList(
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         return itemWidget(context, index);
-      }, childCount: 50),
+      }, childCount: 10),
     );
   }
 

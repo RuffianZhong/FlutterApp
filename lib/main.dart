@@ -1,4 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_wan_android/helper/image_helper.dart';
+import 'package:flutter_wan_android/modules/account/view/login_page.dart';
+import 'package:flutter_wan_android/modules/account/view/register_page.dart';
+import 'package:flutter_wan_android/modules/main/view/main_home.dart';
+import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
+import 'package:flutter_wan_android/res/color_res.dart';
+import 'package:flutter_wan_android/widget/banner_widget.dart';
+import 'package:provider/provider.dart';
+
+import 'core/lifecycle/zt_lifecycle.dart';
+import 'generated/l10n.dart';
+import 'modules/main/view/main_me.dart';
+import 'modules/main/view/main_project.dart';
+import 'modules/main/view/main_square.dart';
+import 'modules/main/view/main_wechat.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,40 +23,36 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      /// widget本地化代理设置
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        S.delegate //自定义国际化
+      ],
+
+      /// widget本地化支持语言
+      supportedLocales: S.delegate.supportedLocales,
+
+      /// 生命周期感知
+      navigatorObservers: [WidgetRouteObserver.routeObserver],
+
+      title: 'WanAndroid',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: ColorRes.theme,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      // home: const LoginPage(),
+      // home: const RegisterPage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -48,68 +60,96 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int _navBarIndex = 0;
+  final PageController _pageController = PageController();
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  MainHomePage? _homePage;
+  MainProjectPage? _projectPage;
+  MainSquarePage? _squarePage;
+  MainWeChatPage? _weChatPage;
+  MainMePage? _mePage;
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => MeViewModel()),
+          ChangeNotifierProvider(create: (context) => BannerViewModel())
+        ],
+        child: Scaffold(
+          body: _bodyContent(),
+          bottomNavigationBar: _bottomNavigationBar(),
+        ));
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Widget _bodyContent() {
+    return PageView.builder(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 5,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return _homePage ??= const MainHomePage();
+          }
+          if (index == 1) {
+            return _projectPage ??= const MainProjectPage();
+          }
+          if (index == 2) {
+            return _squarePage ??= const MainSquarePage();
+          }
+          if (index == 3) {
+            return _weChatPage ??= const MainWeChatPage();
+          }
+          if (index == 4) {
+            return _mePage ??= const MainMePage();
+          }
+          return Container();
+        });
+  }
+
+  /// 底部导航栏bar
+  Widget _bottomNavigationBar() {
+    return BottomNavigationBar(
+      items: [
+        _bottomNavigationBarItem(S.of(context).tab_home, "ic_tab_home.png"),
+        _bottomNavigationBarItem(
+            S.of(context).tab_project, "ic_tab_project.png"),
+        _bottomNavigationBarItem(S.of(context).tab_square, "ic_tab_square.png"),
+        _bottomNavigationBarItem(S.of(context).tab_wechat, "ic_tab_wechat.png"),
+        _bottomNavigationBarItem(S.of(context).tab_me, "ic_tab_me.png"),
+      ],
+      selectedItemColor: ColorRes.themeMain,
+      currentIndex: _navBarIndex,
+      backgroundColor: Colors.white,
+      type: BottomNavigationBarType.fixed,
+      onTap: (index) {
+        setState(() {
+          _navBarIndex = index;
+          _pageController.jumpToPage(index);
+        });
+      },
+    );
+  }
+
+  /// 底部导航栏按钮
+  BottomNavigationBarItem _bottomNavigationBarItem(String label, String icon) {
+    return BottomNavigationBarItem(
+      icon: Image.asset(ImageHelper.wrapAssets(icon),
+          height: 24, width: 24, color: Colors.grey),
+      activeIcon: Image.asset(ImageHelper.wrapAssets(icon),
+          height: 24, width: 24, color: ColorRes.themeMain),
+      label: label,
     );
   }
 }

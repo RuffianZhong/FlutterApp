@@ -49,6 +49,206 @@ class S {
   static S? maybeOf(BuildContext context) {
     return Localizations.of<S>(context, S);
   }
+
+  /// `首页`
+  String get tab_home {
+    return Intl.message(
+      '首页',
+      name: 'tab_home',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `项目`
+  String get tab_project {
+    return Intl.message(
+      '项目',
+      name: 'tab_project',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `公众号`
+  String get tab_wechat {
+    return Intl.message(
+      '公众号',
+      name: 'tab_wechat',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `广场`
+  String get tab_square {
+    return Intl.message(
+      '广场',
+      name: 'tab_square',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `我的`
+  String get tab_me {
+    return Intl.message(
+      '我的',
+      name: 'tab_me',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `积分：{value}`
+  String integral(Object value) {
+    return Intl.message(
+      '积分：$value',
+      name: 'integral',
+      desc: '',
+      args: [value],
+    );
+  }
+
+  /// `收藏`
+  String get collect {
+    return Intl.message(
+      '收藏',
+      name: 'collect',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `暗黑模式`
+  String get dark_style {
+    return Intl.message(
+      '暗黑模式',
+      name: 'dark_style',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `彩色主题`
+  String get color_theme {
+    return Intl.message(
+      '彩色主题',
+      name: 'color_theme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `设置`
+  String get settings {
+    return Intl.message(
+      '设置',
+      name: 'settings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `--`
+  String get placeholder {
+    return Intl.message(
+      '--',
+      name: 'placeholder',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `登录`
+  String get login {
+    return Intl.message(
+      '登录',
+      name: 'login',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `注册`
+  String get register {
+    return Intl.message(
+      '注册',
+      name: 'register',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `立即注册`
+  String get register_now {
+    return Intl.message(
+      '立即注册',
+      name: 'register_now',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `还没账号？`
+  String get no_account {
+    return Intl.message(
+      '还没账号？',
+      name: 'no_account',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `用户名`
+  String get user_name {
+    return Intl.message(
+      '用户名',
+      name: 'user_name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `密码`
+  String get user_psw {
+    return Intl.message(
+      '密码',
+      name: 'user_psw',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `确认密码`
+  String get user_psw_confirm {
+    return Intl.message(
+      '确认密码',
+      name: 'user_psw_confirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `置顶`
+  String get topping {
+    return Intl.message(
+      '置顶',
+      name: 'topping',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{main} - {sub}`
+  String label_group(Object main, Object sub) {
+    return Intl.message(
+      '$main - $sub',
+      name: 'label_group',
+      desc: '',
+      args: [main, sub],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

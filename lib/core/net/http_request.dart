@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import '../../utils/logger.dart';
+import '../../utils/log_util.dart';
 import '../net/http_config.dart';
 import '../net/observer/http_lifecycle_observer.dart';
 //import 'package:flutter_app/generated/json/base/json_convert_content.dart';

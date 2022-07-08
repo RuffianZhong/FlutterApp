@@ -4,13 +4,13 @@ import 'dart:convert';
 
 @JsonSerializable()
 class UserEntity {
+  int? uid = 0;
+  String? nickname = "";
 
-	late int uid;
-	late String nickname;
-  
-  UserEntity();
+  UserEntity({this.uid, this.nickname});
 
-  factory UserEntity.fromJson(Map<String, dynamic> json) => $UserEntityFromJson(json);
+  factory UserEntity.fromJson(Map<String, dynamic> json) =>
+      $UserEntityFromJson(json);
 
   Map<String, dynamic> toJson() => $UserEntityToJson(this);
 

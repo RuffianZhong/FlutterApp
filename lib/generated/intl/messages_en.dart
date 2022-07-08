@@ -20,6 +20,31 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
+  static String m0(value) => "积分：${value}";
+
+  static String m1(main, sub) => "${main} - ${sub}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static Map<String, Function> _notInlinedMessages(_) => <String, Function>{};
+  static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "collect": MessageLookupByLibrary.simpleMessage("收藏"),
+        "color_theme": MessageLookupByLibrary.simpleMessage("彩色主题"),
+        "dark_style": MessageLookupByLibrary.simpleMessage("暗黑模式"),
+        "integral": m0,
+        "label_group": m1,
+        "login": MessageLookupByLibrary.simpleMessage("登录"),
+        "no_account": MessageLookupByLibrary.simpleMessage("还没账号？"),
+        "placeholder": MessageLookupByLibrary.simpleMessage("--"),
+        "register": MessageLookupByLibrary.simpleMessage("注册"),
+        "register_now": MessageLookupByLibrary.simpleMessage("立即注册"),
+        "settings": MessageLookupByLibrary.simpleMessage("设置"),
+        "tab_home": MessageLookupByLibrary.simpleMessage("首页"),
+        "tab_me": MessageLookupByLibrary.simpleMessage("我的"),
+        "tab_project": MessageLookupByLibrary.simpleMessage("项目"),
+        "tab_square": MessageLookupByLibrary.simpleMessage("广场"),
+        "tab_wechat": MessageLookupByLibrary.simpleMessage("公众号"),
+        "topping": MessageLookupByLibrary.simpleMessage("置顶"),
+        "user_name": MessageLookupByLibrary.simpleMessage("用户名"),
+        "user_psw": MessageLookupByLibrary.simpleMessage("密码"),
+        "user_psw_confirm": MessageLookupByLibrary.simpleMessage("确认密码")
+      };
 }

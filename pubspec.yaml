@@ -9,7 +9,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=2.17.5 <3.0.4"
 
 # 项目依赖：三方库依赖
 dependencies:
@@ -45,6 +45,8 @@ dependencies:
   flutter_inappwebview: ^5.4.3+7
   # 数据共享
   provider: ^6.0.3
+  #刷新库
+  easy_refresh: ^3.0.0+2
 
 
 # 开发依赖
@@ -62,6 +64,11 @@ flutter:
 
   # 创建项目自带
   uses-material-design: true
+
+  # 资源路径配置
+  assets:
+    - assets/images/
+    - assets/html/
 
 # 本地化
 flutter_intl:
