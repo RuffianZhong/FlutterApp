@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
-import 'package:flutter_wan_android/modules/account/view/login_page.dart';
-import 'package:flutter_wan_android/modules/account/view/register_page.dart';
+import 'package:flutter_wan_android/modules/main/view/banner_widget.dart';
 import 'package:flutter_wan_android/modules/main/view/main_home.dart';
 import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
 import 'package:flutter_wan_android/res/color_res.dart';
-import 'package:flutter_wan_android/widget/banner_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'core/lifecycle/zt_lifecycle.dart';
 import 'generated/l10n.dart';
+import 'modules/main/view/main_knowledge.dart';
 import 'modules/main/view/main_me.dart';
 import 'modules/main/view/main_project.dart';
 import 'modules/main/view/main_square.dart';
-import 'modules/main/view/main_wechat.dart';
 
 void main() {
   runApp(const MyApp());
@@ -66,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
   MainHomePage? _homePage;
   MainProjectPage? _projectPage;
   MainSquarePage? _squarePage;
-  MainWeChatPage? _weChatPage;
+  MainKnowledgePage? _knowledgePage;
   MainMePage? _mePage;
 
   @override
@@ -79,7 +77,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (context) => MeViewModel()),
-          ChangeNotifierProvider(create: (context) => BannerViewModel())
+          ChangeNotifierProvider(create: (context) => BannerViewModel()),
+          ChangeNotifierProvider(create: (context) => ProjectViewModel()),
+          ChangeNotifierProvider(create: (context) => KnowledgeViewModel()),
+          ChangeNotifierProvider(create: (context) => SquareViewModel()),
         ],
         child: Scaffold(
           body: _bodyContent(),
@@ -109,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
             return _squarePage ??= const MainSquarePage();
           }
           if (index == 3) {
-            return _weChatPage ??= const MainWeChatPage();
+            return _knowledgePage ??= const MainKnowledgePage();
           }
           if (index == 4) {
             return _mePage ??= const MainMePage();

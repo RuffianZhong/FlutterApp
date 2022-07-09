@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:provider/provider.dart';
 
-import '../helper/image_helper.dart';
-import '../res/color_res.dart';
-import '../utils/log_util.dart';
+import '../../../helper/image_helper.dart';
+import '../../../res/color_res.dart';
+import '../../../utils/log_util.dart';
 
 ///Banner控件
 class BannerWidget extends StatefulWidget {

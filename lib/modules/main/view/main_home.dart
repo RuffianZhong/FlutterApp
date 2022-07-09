@@ -1,14 +1,14 @@
+import 'dart:async';
+
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_wan_android/helper/image_helper.dart';
+import 'package:flutter_wan_android/modules/main/view/item_content_widget.dart';
 import 'package:flutter_wan_android/utils/log_util.dart';
 import 'package:provider/provider.dart';
-import 'dart:async';
+
 import '../../../core/lifecycle/zt_lifecycle.dart';
-import '../../../generated/l10n.dart';
-import '../../../res/color_res.dart';
 import '../../../utils/screen_util.dart';
-import '../../../widget/banner_widget.dart';
+import 'banner_widget.dart';
 
 List<String> imageUrl = [
   "https://img2.baidu.com/it/u=1994380678,3283034272&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657213200&t=d57830e0ca280cc0f87fdbf10b25305b",
@@ -79,7 +79,7 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
   }
 
   @override
-  bool get wantKeepAlive => false;
+  bool get wantKeepAlive => true;
 }
 
 ///SliverAppBarWidget
@@ -153,147 +153,8 @@ class _SliverListWidgetState extends State<SliverListWidget> {
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-        return itemWidget(context, index);
+        return ItemContentWidget(index: index);
       }, childCount: 10),
-    );
-  }
-
-  Widget itemWidget(BuildContext context, int index) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-
-            ///顶部信息
-            itemHeaderWidget(context, index),
-
-            const SizedBox(height: 6),
-
-            ///内容
-            itemContentWidget(context, index),
-
-            const SizedBox(height: 4),
-
-            ///底部信息
-            itemFooterWidget(context, index),
-
-            ///分割线
-            itemSeparatorWidget(),
-          ],
-        ));
-  }
-
-  Widget itemHeaderWidget(BuildContext context, int index) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        //作者头像
-        ClipOval(
-          child: ImageHelper.load(imageUrl[index % 5], height: 45, width: 45),
-        ),
-        const SizedBox(width: 4),
-        //作者昵称
-        Expanded(
-            child: Text(
-          "作者名",
-          maxLines: 1,
-          style: TextStyle(fontSize: 14, color: ColorRes.tContentSub),
-        )),
-        const SizedBox(width: 4),
-        //时间
-        Text(
-          "2022-20-20 12:22:22",
-          style: TextStyle(fontSize: 14, color: ColorRes.tContentSub),
-        ),
-      ],
-    );
-  }
-
-  Widget itemContentWidget(BuildContext context, int index) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ///标题
-            Text(
-              "",
-              style: TextStyle(fontSize: 18, color: ColorRes.tContentMain),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            const SizedBox(height: 6),
-
-            ///副标题
-            Offstage(
-                offstage: index % 5 == 2,
-                child: Text(
-                  "",
-                  style: TextStyle(fontSize: 15, color: ColorRes.tContentSub),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                )),
-          ],
-        )),
-
-        const SizedBox(width: 6),
-
-        ///条件性展示控件
-        Offstage(
-            offstage: index % 5 == 2,
-            child: ImageHelper.load(imageUrl[index % 5],
-                height: 100, width: 70, fit: BoxFit.cover)),
-      ],
-    );
-  }
-
-  ///底部内容控件
-  Widget itemFooterWidget(BuildContext context, int index) {
-    return Row(
-      children: [
-        ///置顶标识
-        Offstage(
-            offstage: false,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: Text(
-                S.of(context).topping,
-                style: TextStyle(fontSize: 12, color: ColorRes.themeMain),
-              ),
-              decoration:
-                  BoxDecoration(border: Border.all(color: ColorRes.themeMain)),
-            )),
-
-        const SizedBox(width: 6),
-
-        ///标签
-        Expanded(
-            child: Text(
-          S.of(context).label_group("", ""),
-          style: const TextStyle(fontSize: 14, color: ColorRes.tContentMain),
-        )),
-
-        ///收藏
-        GestureDetector(
-            onTap: () {},
-            child: const Icon(
-              Icons.favorite_border,
-              color: Colors.red,
-            )),
-      ],
-    );
-  }
-
-  ///item分割线
-  Widget itemSeparatorWidget() {
-    return Container(
-      height: 1,
-      margin: const EdgeInsets.only(top: 10),
-      color: Colors.grey[300],
     );
   }
 }

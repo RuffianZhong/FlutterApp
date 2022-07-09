@@ -5,6 +5,7 @@ import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/generated/l10n.dart';
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
+import 'package:flutter_wan_android/utils/screen_util.dart';
 import 'package:provider/provider.dart';
 
 import '../../../res/color_res.dart';
@@ -43,6 +44,9 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
 
   /// 头部内容
   Widget _headerContent(BuildContext context) {
+    double topBarHeight =
+        ScreenUtil.get().appBarHeight + ScreenUtil.get().statusBarHeight;
+
     return Container(
       color: ColorRes.themeMain,
       width: double.infinity,
@@ -54,7 +58,8 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
               Center(
                   child: Column(
                 children: [
-                  const SizedBox(height: 50),
+                  ///模拟头部appBar
+                  SizedBox(height: topBarHeight),
 
                   ///圆形头像
                   ClipRRect(
@@ -95,12 +100,13 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
               /// 退出登录
               Positioned(
                   right: 20,
-                  top: 40,
+                  top: topBarHeight - ScreenUtil.get().appBarHeight / 2 - 12,
                   child: GestureDetector(
                     onTap: () {},
                     child: const Icon(
                       Icons.exit_to_app,
                       color: Colors.white,
+                      size: 24,
                     ),
                   )),
             ],
