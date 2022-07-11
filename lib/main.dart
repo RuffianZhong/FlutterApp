@@ -7,12 +7,14 @@ import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
 import 'package:flutter_wan_android/res/color_res.dart';
 import 'package:provider/provider.dart';
 
+import 'config/route_config.dart';
 import 'core/lifecycle/zt_lifecycle.dart';
 import 'generated/l10n.dart';
 import 'modules/main/view/main_knowledge.dart';
 import 'modules/main/view/main_me.dart';
 import 'modules/main/view/main_project.dart';
 import 'modules/main/view/main_square.dart';
+import 'modules/search/view/search_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,12 +40,16 @@ class MyApp extends StatelessWidget {
       /// 生命周期感知
       navigatorObservers: [WidgetRouteObserver.routeObserver],
 
+      ///路由表配置
+      routes: RouteConfig.routes,
+
       title: 'WanAndroid',
       theme: ThemeData(
         primarySwatch: ColorRes.theme,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      // home: const LoginPage(),
+      home: SearchPage(),
+      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      // home: const (),
       // home: const RegisterPage(),
     );
   }
@@ -81,6 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ChangeNotifierProvider(create: (context) => ProjectViewModel()),
           ChangeNotifierProvider(create: (context) => KnowledgeViewModel()),
           ChangeNotifierProvider(create: (context) => SquareViewModel()),
+          ChangeNotifierProvider(create: (context) => HomeViewModel()),
+          ChangeNotifierProvider(create: (context) => SearchViewModel())
         ],
         child: Scaffold(
           body: _bodyContent(),
@@ -143,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  ///home menu_book perm_identity
   /// 底部导航栏按钮
   BottomNavigationBarItem _bottomNavigationBarItem(String label, String icon) {
     return BottomNavigationBarItem(

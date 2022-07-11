@@ -72,10 +72,10 @@ class _BannerWidgetState extends ZTLifecycleState<BannerWidget> {
       return PageView.builder(
         controller: viewModel.controller,
         itemBuilder: (BuildContext context, int index) {
-          Logger.log("itemBuilder--index:$index");
+         // Logger.log("itemBuilder--index:$index");
 
           if (viewModel.dataArray.isNotEmpty) {
-            Logger.log("---------viewModel.index:${viewModel.index}");
+            //Logger.log("---------viewModel.index:${viewModel.index}");
             return ImageHelper.load(
                 viewModel.dataArray[index % viewModel.dataArray.length],
                 fit: BoxFit.fitWidth);
@@ -84,7 +84,7 @@ class _BannerWidgetState extends ZTLifecycleState<BannerWidget> {
           }
         },
         onPageChanged: (int index) {
-          Logger.log("onPageChanged--index:$index");
+         // Logger.log("onPageChanged--index:$index");
           viewModel.onPageChanged(index);
         },
         itemCount: viewModel.itemCount,
@@ -191,7 +191,7 @@ class BannerViewModel extends ChangeNotifier with WidgetLifecycleObserver {
 
   @override
   void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onStop) {
+    if (state == WidgetLifecycleState.onDestroy) {
       destroy();
     }
   }

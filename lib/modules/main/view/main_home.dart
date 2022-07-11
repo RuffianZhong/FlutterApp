@@ -2,8 +2,12 @@ import 'dart:async';
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/config/route_config.dart';
+import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/main/view/item_content_widget.dart';
+import 'package:flutter_wan_android/modules/search/view/search_page.dart';
 import 'package:flutter_wan_android/utils/log_util.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/lifecycle/zt_lifecycle.dart';
@@ -27,10 +31,16 @@ class MainHomePage extends StatefulWidget {
 
 class _MainHomePageState extends ZTLifecycleState<MainHomePage>
     with WidgetLifecycleObserver, AutomaticKeepAliveClientMixin {
+  ScrollController scrollController = ScrollController();
+
   @override
   initState() {
     super.initState();
     getLifecycle().addObserver(this);
+    scrollController.addListener(() {
+      context.read<HomeViewModel>().quickToTop =
+          scrollController.offset >= ScreenUtil.get().screenHeight;
+    });
   }
 
   @override
@@ -38,6 +48,7 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
     super.build(context);
     return Scaffold(
       body: bodyContent(),
+      floatingActionButton: floatingActionButton(),
     );
   }
 
@@ -50,6 +61,7 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
           SliverAppBarWidget(),
           SliverListWidget(),
         ],
+        controller: scrollController,
       ),
       controller: controller,
       onRefresh: () async {
@@ -65,6 +77,31 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
         });
       },
     );
+  }
+
+  Widget floatingActionButton() {
+    return Consumer<HomeViewModel>(builder: (context, viewModel, child) {
+      return FloatingActionButton(
+          child: Icon(viewModel.quickToTop ? Icons.arrow_upward : Icons.search),
+          onPressed: () {
+            if (viewModel.quickToTop) {
+              scrollController.animateTo(0,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.bounceIn);
+            } else {
+              Fluttertoast.showToast(msg: "搜索");
+              nav2SearchPage();
+            }
+          });
+    });
+  }
+
+  void nav2SearchPage() {
+ /*   RouterHelper.pushNamed(context, RouteConfig.searchPage,
+        arguments: {"name": "测试名称"});*/
+    Navigator.push(context, MaterialPageRoute(builder: (context){
+      return SearchPage();
+    }));
   }
 
   @override
@@ -156,5 +193,17 @@ class _SliverListWidgetState extends State<SliverListWidget> {
         return ItemContentWidget(index: index);
       }, childCount: 10),
     );
+  }
+}
+
+class HomeViewModel extends ChangeNotifier {
+  ///快速回到顶部
+  bool _quickToTop = false;
+
+  bool get quickToTop => _quickToTop;
+
+  set quickToTop(bool value) {
+    _quickToTop = value;
+    notifyListeners();
   }
 }
