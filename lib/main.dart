@@ -88,7 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ChangeNotifierProvider(create: (context) => KnowledgeViewModel()),
           ChangeNotifierProvider(create: (context) => SquareViewModel()),
           ChangeNotifierProvider(create: (context) => HomeViewModel()),
-          ChangeNotifierProvider(create: (context) => SearchViewModel())
         ],
         child: Scaffold(
           body: _bodyContent(),

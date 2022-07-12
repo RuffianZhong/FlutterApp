@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import '../../generated/json/base/json_convert_content.dart';
 import '../../utils/log_util.dart';
 import '../net/http_config.dart';
 import '../net/observer/http_lifecycle_observer.dart';
-//import 'package:flutter_app/generated/json/base/json_convert_content.dart';
 
 import 'cancel/zt_http_cancel.dart';
 
@@ -29,11 +29,11 @@ class HttpRequest {
     Interceptor? inter,
     ProgressCallback? sendProgress,
     ProgressCallback? receiveProgress,
-  }) {
+  }) async {
     /// 检查是否需要生命周期感知
     checkLifecycleAware(canceler);
 
-    return request<T>(url,
+    return await request<T>(url,
         method: "get",
         data: data,
         params: params,
@@ -109,11 +109,11 @@ class HttpRequest {
         serviceData = responseData['data'];
 
         /// 依据泛型是 List 还是 Map(实体) 做不同解析
-       /* if (serviceData is List) {
+        if (serviceData is List) {
           e.data = JsonConvert.fromJsonAsT(serviceData);
         } else {
           e.data = jsonConvert.convert<T>(serviceData);
-        }*/
+        }
       }
 
       //这里处理结果拦截

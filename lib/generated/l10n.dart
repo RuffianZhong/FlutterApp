@@ -249,6 +249,66 @@ class S {
       args: [main, sub],
     );
   }
+
+  /// `用空格分隔多个关键词`
+  String get search_hint {
+    return Intl.message(
+      '用空格分隔多个关键词',
+      name: 'search_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `热门搜索`
+  String get search_hot_title {
+    return Intl.message(
+      '热门搜索',
+      name: 'search_hot_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `历史搜索`
+  String get search_local_title {
+    return Intl.message(
+      '历史搜索',
+      name: 'search_local_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `编辑`
+  String get edit {
+    return Intl.message(
+      '编辑',
+      name: 'edit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `清除全部`
+  String get clean_all {
+    return Intl.message(
+      '清除全部',
+      name: 'clean_all',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `完成`
+  String get done {
+    return Intl.message(
+      '完成',
+      name: 'done',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

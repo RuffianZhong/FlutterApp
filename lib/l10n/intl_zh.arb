@@ -18,5 +18,11 @@
   "user_psw": "密码",
   "user_psw_confirm": "确认密码",
   "topping": "置顶",
-  "label_group": "{main} - {sub}"
+  "label_group": "{main} - {sub}",
+  "search_hint": "用空格分隔多个关键词",
+  "search_hot_title": "热门搜索",
+  "search_local_title": "历史搜索",
+  "edit": "编辑",
+  "clean_all": "清除全部",
+  "done": "完成"
 }

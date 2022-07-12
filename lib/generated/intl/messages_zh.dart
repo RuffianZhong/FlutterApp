@@ -26,9 +26,12 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "clean_all": MessageLookupByLibrary.simpleMessage("清除全部"),
         "collect": MessageLookupByLibrary.simpleMessage("收藏"),
         "color_theme": MessageLookupByLibrary.simpleMessage("彩色主题"),
         "dark_style": MessageLookupByLibrary.simpleMessage("暗黑模式"),
+        "done": MessageLookupByLibrary.simpleMessage("完成"),
+        "edit": MessageLookupByLibrary.simpleMessage("编辑"),
         "integral": m0,
         "label_group": m1,
         "login": MessageLookupByLibrary.simpleMessage("登录"),
@@ -36,6 +39,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "placeholder": MessageLookupByLibrary.simpleMessage("--"),
         "register": MessageLookupByLibrary.simpleMessage("注册"),
         "register_now": MessageLookupByLibrary.simpleMessage("立即注册"),
+        "search_hint": MessageLookupByLibrary.simpleMessage("用空格分隔多个关键词"),
+        "search_hot_title": MessageLookupByLibrary.simpleMessage("热门搜索"),
+        "search_local_title": MessageLookupByLibrary.simpleMessage("历史搜索"),
         "settings": MessageLookupByLibrary.simpleMessage("设置"),
         "tab_home": MessageLookupByLibrary.simpleMessage("首页"),
         "tab_me": MessageLookupByLibrary.simpleMessage("我的"),
