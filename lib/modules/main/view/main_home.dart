@@ -4,6 +4,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/config/route_config.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
+import 'package:flutter_wan_android/modules/main/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/main/view/item_content_widget.dart';
 import 'package:flutter_wan_android/modules/search/view/search_page.dart';
 import 'package:flutter_wan_android/utils/log_util.dart';
@@ -12,6 +13,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/lifecycle/zt_lifecycle.dart';
 import '../../../utils/screen_util.dart';
+import '../view_model/home_view_model.dart';
 import 'banner_widget.dart';
 
 List<String> imageUrl = [
@@ -56,13 +58,6 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
     EasyRefreshController controller = EasyRefreshController();
 
     return EasyRefresh(
-      child: CustomScrollView(
-        slivers: [
-          SliverAppBarWidget(),
-          SliverListWidget(),
-        ],
-        controller: scrollController,
-      ),
       controller: controller,
       onRefresh: () async {
         await Future.delayed(Duration(seconds: 2), () {
@@ -76,6 +71,13 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
           //  controller.finishLoad();
         });
       },
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBarWidget(),
+          SliverListWidget(),
+        ],
+        controller: scrollController,
+      ),
     );
   }
 
@@ -97,9 +99,9 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
   }
 
   void nav2SearchPage() {
- /*   RouterHelper.pushNamed(context, RouteConfig.searchPage,
+    /*   RouterHelper.pushNamed(context, RouteConfig.searchPage,
         arguments: {"name": "测试名称"});*/
-    Navigator.push(context, MaterialPageRoute(builder: (context){
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
       return SearchPage();
     }));
   }
@@ -179,6 +181,7 @@ class _SliverAppBarWidgetState extends State<SliverAppBarWidget> {
 
 ///SliverListWidget
 class SliverListWidget extends StatefulWidget {
+
   const SliverListWidget({Key? key}) : super(key: key);
 
   @override
@@ -190,20 +193,8 @@ class _SliverListWidgetState extends State<SliverListWidget> {
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-        return ItemContentWidget(index: index);
+        return ItemContentWidget(article: ArticleEntity());
       }, childCount: 10),
     );
-  }
-}
-
-class HomeViewModel extends ChangeNotifier {
-  ///快速回到顶部
-  bool _quickToTop = false;
-
-  bool get quickToTop => _quickToTop;
-
-  set quickToTop(bool value) {
-    _quickToTop = value;
-    notifyListeners();
   }
 }

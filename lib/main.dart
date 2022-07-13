@@ -14,6 +14,7 @@ import 'modules/main/view/main_knowledge.dart';
 import 'modules/main/view/main_me.dart';
 import 'modules/main/view/main_project.dart';
 import 'modules/main/view/main_square.dart';
+import 'modules/main/view_model/home_view_model.dart';
 import 'modules/search/view/search_page.dart';
 
 void main() {

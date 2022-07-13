@@ -11,6 +11,10 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.17.5 <3.0.4"
 
+#强制解决依赖冲突
+dependency_overrides:
+  path_drawing: ^0.5.1
+
 # 项目依赖：三方库依赖
 dependencies:
   flutter:
@@ -47,7 +51,8 @@ dependencies:
   provider: ^6.0.3
   #刷新库
   easy_refresh: ^3.0.0+2
-
+  #解析html
+  flutter_html: ^2.2.1
 
 # 开发依赖
 dev_dependencies:

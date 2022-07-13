@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_wan_android/core/net/cancel/zt_http_cancel.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
 import 'package:flutter_wan_android/modules/search/model/search_model.dart';
 
 import '../../../utils/log_util.dart';
+import '../../main/model/article_entity.dart';
 
 ///SearchViewModel
 class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   late SearchModel model;
 
   SearchViewModel() {
-    Logger.log("-----ViewModel");
     model = SearchModel();
   }
 
@@ -34,8 +35,8 @@ class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
     notifyListeners();
   }
 
-  void getServerData() async {
-    model.getServerData().then((value) => serverLabels = value);
+  void getHotKeyFromServer() async {
+    model.getHotKeyFromServer().then((value) => serverLabels = value);
   }
 
   ///本地标签
@@ -48,7 +49,7 @@ class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
     notifyListeners();
   }
 
-  void getLocalData() async {
+  void getSearchKeyFromLocal() async {
     model.getLocalData().then((value) => localLabels = value);
   }
 
@@ -60,6 +61,23 @@ class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   set showSearchUI(bool value) {
     _showSearchUI = value;
     notifyListeners();
+  }
+
+  ///文章列表
+  List<ArticleEntity> _articleList = [];
+
+  List<ArticleEntity> get articleList => _articleList;
+
+  set articleList(List<ArticleEntity> value) {
+    _articleList = value;
+    notifyListeners();
+  }
+
+  ///搜索内容
+  void getContentFromServer(String key, WidgetLifecycleOwner lifecycleOwner) {
+    model.getContentFromServer(key, HttpCanceler(lifecycleOwner)).then((value) {
+      articleList = value.datas;
+    });
   }
 
   @override

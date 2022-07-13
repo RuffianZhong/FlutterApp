@@ -309,6 +309,16 @@ class S {
       args: [],
     );
   }
+
+  /// `内容加载中...`
+  String get loading_content {
+    return Intl.message(
+      '内容加载中...',
+      name: 'loading_content',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

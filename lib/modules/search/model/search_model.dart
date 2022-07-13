@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter_wan_android/core/db/dao/search_dao.dart';
 import 'package:flutter_wan_android/core/db/db_helper.dart';
 import 'package:flutter_wan_android/core/net/http_request.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
 
-import '../../../utils/log_util.dart';
+import '../../../core/net/cancel/http_canceler.dart';
+import '../../main/model/article_rsp_entity.dart';
 
 ///SearchModel
 class SearchModel {
@@ -13,7 +12,6 @@ class SearchModel {
   late SearchDao dao;
 
   SearchModel() {
-    Logger.log("-----Model");
     helper = SqliteHelper();
     dao = SearchDao();
   }
@@ -36,9 +34,20 @@ class SearchModel {
   ///热门搜索API
   String hotKeyApi = "/hotkey/json";
 
+  ///搜索内容API
+  String searchApi = "/article/query/0/json";
+
   ///获取服务器热门搜索词
-  Future<List<SearchEntity>> getServerData() async {
+  Future<List<SearchEntity>> getHotKeyFromServer() async {
     return await HttpRequest.get<List<SearchEntity>>(hotKeyApi);
+  }
+
+  ///搜索内容
+  Future<ArticleRspEntity> getContentFromServer(
+      String key, HttpCanceler? canceler) async {
+    Map<String, dynamic>? params = {"k": key};
+    return await HttpRequest.post<ArticleRspEntity>(searchApi,
+        params: params, canceler: canceler);
   }
 
   void close() {

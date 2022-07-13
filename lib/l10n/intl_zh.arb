@@ -24,5 +24,6 @@
   "search_local_title": "历史搜索",
   "edit": "编辑",
   "clean_all": "清除全部",
-  "done": "完成"
+  "done": "完成",
+  "loading_content": "内容加载中..."
 }

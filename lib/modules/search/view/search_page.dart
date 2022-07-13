@@ -1,6 +1,7 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/config/route_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
@@ -55,10 +56,10 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
   void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
     if (state == WidgetLifecycleState.onCreate) {
       ///初始化本地数据
-      _buildContext.read<SearchViewModel>().getLocalData();
+      _buildContext.read<SearchViewModel>().getSearchKeyFromLocal();
 
       ///初始化服务器数据
-      _buildContext.read<SearchViewModel>().getServerData();
+      _buildContext.read<SearchViewModel>().getHotKeyFromServer();
     }
   }
 
@@ -67,7 +68,6 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
   void actionSearch(
       BuildContext context, SearchViewModel viewModel, String label,
       {int? id}) {
-    Logger.log("-----actionSearch");
     if (label.isNotEmpty) {
       setState(() {
         editingController.text = label;
@@ -83,16 +83,15 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
 
       ///本地数据更新
       viewModel.model.insertOrUpdateLocalData(submitValue, id: id);
-      viewModel.getLocalData();
+      viewModel.getSearchKeyFromLocal();
 
       ///网络数据请求
-
+      viewModel.getContentFromServer(submitValue, this);
     }
   }
 
   ///执行返回逻辑
   void actionBack(BuildContext context, SearchViewModel viewModel) {
-    Logger.log("-----actionBack:${viewModel.showSearchUI}");
     if (!viewModel.showSearchUI) {
       viewModel.showSearchUI = true;
     } else {
@@ -108,7 +107,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
       viewModel.editingData = false;
     }
     viewModel.model.deleteLocalData(id: id);
-    viewModel.getLocalData();
+    viewModel.getSearchKeyFromLocal();
   }
 
   ///导航栏
@@ -167,25 +166,34 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
     EasyRefreshController controller = EasyRefreshController();
 
     return EasyRefresh(
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return ItemContentWidget(index: index);
-        },
-        itemCount: 10,
-      ),
       controller: controller,
+      footer:ClassicFooter() ,
       onRefresh: () async {
         await Future.delayed(Duration(seconds: 2), () {
           //controller.callRefresh();
           // controller.finishRefresh();
+          return IndicatorResult.success;
         });
       },
       onLoad: () async {
         await Future.delayed(Duration(seconds: 2), () {
           //   controller.callLoad();
           //  controller.finishLoad();
+          return IndicatorResult.noMore;
         });
       },
+      ///return IndicatorResult.success;
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return GestureDetector(
+              onTap: () {
+                RouterHelper.pushNamed(context, RouteConfig.articleDetailsPage,
+                    arguments: viewModel.articleList[index]);
+              },
+              child: ItemContentWidget(article: viewModel.articleList[index]));
+        },
+        itemCount: viewModel.articleList.length,
+      ),
     );
   }
 
@@ -285,8 +293,8 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
                   ),
                   onPressed: deleteStyle
                       ? null
-                      : () =>
-                          actionSearch(context, viewModel, value ?? "", id: id),
+                      : () => actionSearch(context, viewModel, value ?? "",
+                          id: style == 1 ? null : id),
                   onDeleted: !deleteStyle
                       ? null
                       : () => actionDelete(viewModel, id: id),

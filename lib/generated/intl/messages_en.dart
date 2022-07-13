@@ -34,6 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "edit": MessageLookupByLibrary.simpleMessage("编辑"),
         "integral": m0,
         "label_group": m1,
+        "loading_content": MessageLookupByLibrary.simpleMessage("内容加载中..."),
         "login": MessageLookupByLibrary.simpleMessage("登录"),
         "no_account": MessageLookupByLibrary.simpleMessage("还没账号？"),
         "placeholder": MessageLookupByLibrary.simpleMessage("--"),

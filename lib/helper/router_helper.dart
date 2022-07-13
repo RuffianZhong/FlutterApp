@@ -67,4 +67,11 @@ class RouterHelper {
     T? entity = jsonConvert.convert<T>(argumentsMap(context));
     return entity;
   }
+
+  ///获取参数：T
+  static T? argumentsT<T>(BuildContext context) {
+    Object? object = ModalRoute.of(context)?.settings.arguments;
+    if (object == null) return null;
+    return object as T;
+  }
 }

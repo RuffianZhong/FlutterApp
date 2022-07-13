@@ -1,4 +1,3 @@
-import 'package:flutter_wan_android/utils/log_util.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../../modules/search/model/search_entity.dart';
@@ -55,11 +54,8 @@ class SearchDao {
         await helper.query(tbSearch, orderBy: "$fSearchTime DESC");
     List<SearchEntity> entityList = [];
     if (list != null) {
-      SearchEntity entity;
       for (var item in list) {
-        entity = fromMap(item);
-        entityList.add(entity);
-        Logger.log("v:${entity.value}===t:${entity.time}");
+        entityList.add(fromMap(item));
       }
     }
 

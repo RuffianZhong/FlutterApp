@@ -7,7 +7,7 @@ SearchEntity $SearchEntityFromJson(Map<String, dynamic> json) {
 	if (id != null) {
 		searchEntity.id = id;
 	}
-	final String? value = jsonConvert.convert<String>(json['value']);
+	final String? value = jsonConvert.convert<String>(json['name']);
 	if (value != null) {
 		searchEntity.value = value;
 	}
@@ -21,7 +21,7 @@ SearchEntity $SearchEntityFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> $SearchEntityToJson(SearchEntity entity) {
 	final Map<String, dynamic> data = <String, dynamic>{};
 	data['id'] = entity.id;
-	data['value'] = entity.value;
+	data['name'] = entity.value;
 	data['time'] = entity.time;
 	return data;
 }

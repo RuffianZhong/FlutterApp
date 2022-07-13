@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/utils/log_util.dart';
 import 'package:provider/provider.dart';
 
+import '../model/article_entity.dart';
 import 'item_content_widget.dart';
 
 class MainProjectPage extends StatefulWidget {
@@ -64,12 +65,6 @@ class _TabBarViewItemPageState extends State<TabBarViewItemPage>
     EasyRefreshController controller = EasyRefreshController();
 
     return EasyRefresh(
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return ItemContentWidget(index: index);
-        },
-        itemCount: 10,
-      ),
       controller: controller,
       onRefresh: () async {
         await Future.delayed(Duration(seconds: 2), () {
@@ -83,6 +78,12 @@ class _TabBarViewItemPageState extends State<TabBarViewItemPage>
           //  controller.finishLoad();
         });
       },
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return ItemContentWidget(article: ArticleEntity());
+        },
+        itemCount: 10,
+      ),
     );
   }
 
