@@ -7,6 +7,10 @@ class UserEntity {
   int? uid = 0;
   String? nickname = "";
 
+  ///积分
+  int? coinCount = 0;
+  String? icon = "";
+
   UserEntity({this.uid, this.nickname});
 
   factory UserEntity.fromJson(Map<String, dynamic> json) =>

@@ -1,7 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/config/router_config.dart';
+import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
+import 'package:flutter_wan_android/helper/router_helper.dart';
+import 'package:flutter_wan_android/modules/account/view_model/login_view_model.dart';
+import 'package:flutter_wan_android/utils/screen_util.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
+import '../../../core/net/cancel/http_canceler.dart';
 import '../../../generated/l10n.dart';
 import '../../../res/color_res.dart';
 
@@ -13,15 +21,58 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ZTLifecycleState<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _bodyContent(context),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => LoginViewModel())
+        ],
+        child: Consumer<LoginViewModel>(builder: (context, viewModel, child) {
+          return Scaffold(
+            body: _bodyContent(context, viewModel),
+          );
+        }));
   }
 
-  Widget _bodyContent(BuildContext context) {
+  ///登录
+  void actionLogin(BuildContext context, LoginViewModel viewModel) {
+    String account = _accountController.text;
+    String psw = _pswController.text;
+    if (account.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).account_empty_tip);
+      return;
+    }
+    if (psw.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).psw_empty_tip);
+    }
+    viewModel.model.login(account, psw, HttpCanceler(this)).then((value) {
+      viewModel.loginSuccess(value);
+      Fluttertoast.showToast(msg: "登录成功");
+    }).onError((error, stackTrace) {
+      Fluttertoast.showToast(msg: "登录失败");
+    });
+  }
+
+  ///注册
+  void actionRegister(BuildContext context) {
+    RouterHelper.pushNamed(context, RouterConfig.registerPage);
+  }
+
+  ///返回操作
+  void actionBack(BuildContext context, bool isLogin) {
+    RouterHelper.pop<bool>(context, isLogin);
+  }
+
+  ///输入框值改变
+  void onTextChange(LoginViewModel viewModel) {
+    String account = _accountController.text;
+    String psw = _pswController.text;
+
+    viewModel.canLogin = account.isNotEmpty && psw.isNotEmpty;
+  }
+
+  Widget _bodyContent(BuildContext context, LoginViewModel viewModel) {
     ///CustomScrollView 包裹内容可滚动，避免键盘弹出时页面内容超出范围
     return CustomScrollView(
       slivers: [
@@ -33,15 +84,33 @@ class _LoginPageState extends State<LoginPage> {
               _logoWidget(),
 
               ///登录表单
-              _loginFromWidget(context),
+              _loginFromWidget(context, viewModel),
 
               ///注册
               _registerWidget(context),
+
+              ///关闭页面
+              _closeWidget()
             ],
           ),
         )
       ],
     );
+  }
+
+  ///关闭页面
+  Widget _closeWidget() {
+    return Positioned(
+        left: 20,
+        top: ScreenUtil.get().appBarHeight,
+        child: GestureDetector(
+          onTap: () => actionBack(context, false),
+          child: const Icon(
+            Icons.close,
+            color: Colors.white,
+            size: 30,
+          ),
+        ));
   }
 
   ///logo组件
@@ -50,14 +119,21 @@ class _LoginPageState extends State<LoginPage> {
       alignment: Alignment.center,
       height: 300,
       color: ColorRes.themeMain,
-      child: Image.asset(ImageHelper.wrapAssets("ic_logo.png"),
-          width: 150, color: Colors.white),
+      child: ImageHelper.assets("ic_logo.png", width: 150, color: Colors.white),
     );
   }
 
+  ///账号Controller
+  final TextEditingController _accountController = TextEditingController();
+
+  ///密码Controller
+  final TextEditingController _pswController = TextEditingController();
+
+  ///密码焦点
+  final _pswNode = FocusNode();
+
   ///登录表单组件
-  Widget _loginFromWidget(BuildContext context) {
-    final pswNode = FocusNode();
+  Widget _loginFromWidget(BuildContext context, LoginViewModel viewModel) {
     return Container(
       height: 300,
       margin: const EdgeInsets.fromLTRB(30, 250, 30, 0),
@@ -79,40 +155,42 @@ class _LoginPageState extends State<LoginPage> {
               Icons.perm_identity,
               CupertinoIcons.clear,
               false,
-              null,
+              _accountController,
               TextInputAction.next,
-              null,
-              (value) {}, (value) {
-            FocusScope.of(context).requestFocus(pswNode);
-          }, () {}),
+              () => _accountController.clear(),
+              onSubmitted: (value) =>
+                  FocusScope.of(context).requestFocus(_pswNode),
+              onChanged: (_) => onTextChange(viewModel)),
 
           ///密码
           _textFieldWidget(
               context,
               S.of(context).user_psw,
               Icons.lock_outline,
-              CupertinoIcons.eye,
-              true,
-              pswNode,
+              viewModel.obscureText
+                  ? CupertinoIcons.eye
+                  : CupertinoIcons.eye_slash_fill,
+              viewModel.obscureText,
+              _pswController,
               TextInputAction.done,
-              null,
-              (value) {},
-              (value) {},
-              () {}),
+              () => viewModel.obscureText = !viewModel.obscureText,
+              focusNode: _pswNode,
+              onChanged: (_) => onTextChange(viewModel)),
 
           const SizedBox(height: 40),
 
           ///登录
-          _loginButtonWidget(context)
+          _loginButtonWidget(context, viewModel)
         ],
       ),
     );
   }
 
   ///登录按钮组件
-  Widget _loginButtonWidget(BuildContext context) {
+  Widget _loginButtonWidget(BuildContext context, LoginViewModel viewModel) {
     return TextButton(
-      onPressed: () {},
+      onPressed:
+          !viewModel.canLogin ? null : () => actionLogin(context, viewModel),
       style: ButtonStyle(
         ///背景
         backgroundColor: MaterialStateProperty.resolveWith((states) {
@@ -150,12 +228,12 @@ class _LoginPageState extends State<LoginPage> {
       IconData prefixIcon,
       IconData suffixIcon,
       bool obscureText,
-      FocusNode? focusNode,
-      TextInputAction? textInputAction,
       TextEditingController? controller,
-      ValueChanged<String>? onChanged,
+      TextInputAction? textInputAction,
+      VoidCallback onSuffixPressed,
+      {FocusNode? focusNode,
       ValueChanged<String>? onSubmitted,
-      VoidCallback onSuffixPressed) {
+      ValueChanged<String>? onChanged}) {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: TextField(
@@ -200,14 +278,17 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.only(top: 600),
-      child: Text.rich(TextSpan(children: [
-        TextSpan(
-            text: S.of(context).no_account,
-            style: const TextStyle(color: Colors.black)),
-        TextSpan(
-            text: S.of(context).register_now,
-            style: const TextStyle(color: ColorRes.themeMain))
-      ])),
+      child: GestureDetector(
+        onTap: () => actionRegister(context),
+        child: Text.rich(TextSpan(children: [
+          TextSpan(
+              text: S.of(context).no_account,
+              style: const TextStyle(color: Colors.black)),
+          TextSpan(
+              text: S.of(context).register_now,
+              style: const TextStyle(color: ColorRes.themeMain))
+        ])),
+      ),
     );
   }
 }

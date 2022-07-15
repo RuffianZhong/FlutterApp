@@ -1,9 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
+import '../../../core/net/cancel/http_canceler.dart';
 import '../../../generated/l10n.dart';
+import '../../../helper/router_helper.dart';
 import '../../../res/color_res.dart';
+import '../../../utils/screen_util.dart';
+import '../view_model/register_view_model.dart';
 
 ///注册页面
 class RegisterPage extends StatefulWidget {
@@ -13,15 +20,87 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
+  ///账号Controller
+  final TextEditingController _accountController = TextEditingController();
+
+  ///密码Controller
+  final TextEditingController _pswController = TextEditingController();
+
+  ///确认密码Controller
+  final TextEditingController _pswConfirmController = TextEditingController();
+
+  ///密码焦点
+  final _pswNode = FocusNode();
+
+  ///确认密码焦点
+  final _pswConfirmNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _bodyContent(context),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => RegisterViewModel())
+        ],
+        child:
+            Consumer<RegisterViewModel>(builder: (context, viewModel, child) {
+          return Scaffold(
+            body: _bodyContent(context, viewModel),
+          );
+        }));
   }
 
-  Widget _bodyContent(BuildContext context) {
+  ///登录
+  void actionRegister(BuildContext context, RegisterViewModel viewModel) {
+    String account = _accountController.text.trim();
+    String psw = _pswController.text.trim();
+    String pswConfirm = _pswConfirmController.text.trim();
+
+    if (account.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).account_empty_tip);
+      return;
+    }
+    if (psw.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).psw_empty_tip);
+      return;
+    }
+
+    if (pswConfirm.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).psw_confirm_empty_tip);
+      return;
+    }
+
+    if (Comparable.compare(psw, pswConfirm) != 0) {
+      Fluttertoast.showToast(msg: S.of(context).psw_confirm_tip);
+      return;
+    }
+
+    viewModel.model
+        .register(account, psw, pswConfirm, HttpCanceler(this))
+        .then((value) {
+      // viewModel.loginSuccess(value);
+      Fluttertoast.showToast(msg: "登录成功");
+    }).onError((error, stackTrace) {
+      Fluttertoast.showToast(msg: "登录失败");
+    });
+  }
+
+  ///返回操作
+  void actionBack(BuildContext context, bool isLogin) {
+    RouterHelper.pop<bool>(context, isLogin);
+  }
+
+  ///输入框值改变
+  void onTextChange(RegisterViewModel viewModel) {
+    String account = _accountController.text.trim();
+    String psw = _pswController.text.trim();
+    String pswConfirm = _pswConfirmController.text.trim();
+
+    viewModel.canRegister =
+        account.isNotEmpty && psw.isNotEmpty && pswConfirm.isNotEmpty;
+  }
+
+  Widget _bodyContent(BuildContext context, RegisterViewModel viewModel) {
     ///CustomScrollView 包裹内容可滚动，避免键盘弹出时页面内容超出范围
     return CustomScrollView(
       slivers: [
@@ -33,12 +112,30 @@ class _RegisterPageState extends State<RegisterPage> {
               _logoWidget(),
 
               ///登录表单
-              _registerFromWidget(context),
+              _registerFromWidget(context, viewModel),
+
+              ///关闭页面
+              _closeWidget()
             ],
           ),
         )
       ],
     );
+  }
+
+  ///关闭页面
+  Widget _closeWidget() {
+    return Positioned(
+        left: 20,
+        top: ScreenUtil.get().appBarHeight,
+        child: GestureDetector(
+          onTap: () => actionBack(context, false),
+          child: const Icon(
+            Icons.close,
+            color: Colors.white,
+            size: 30,
+          ),
+        ));
   }
 
   ///logo组件
@@ -53,9 +150,8 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   ///注册表单组件
-  Widget _registerFromWidget(BuildContext context) {
-    final pswNode = FocusNode();
-    final pswConfirmNode = FocusNode();
+  Widget _registerFromWidget(
+      BuildContext context, RegisterViewModel viewModel) {
     return Container(
       height: 380,
       margin: const EdgeInsets.fromLTRB(30, 250, 30, 0),
@@ -77,62 +173,61 @@ class _RegisterPageState extends State<RegisterPage> {
               Icons.perm_identity,
               CupertinoIcons.clear,
               false,
-              null,
+              _accountController,
               TextInputAction.next,
-              null,
-              (value) {},
-              (value) {
-                FocusScope.of(context).requestFocus(pswNode);
-              },
-              () {},
-              (value) {
-                if (value != null) {
-                  return value.trim().isNotEmpty ? null : "字段不能为空";
-                }
-              }),
+              () => _accountController.clear(),
+              onSubmitted: (value) =>
+                  FocusScope.of(context).requestFocus(_pswNode),
+              onChanged: (_) => onTextChange(viewModel)),
 
           ///密码
           _textFieldWidget(
               context,
               S.of(context).user_psw,
               Icons.lock_outline,
-              CupertinoIcons.eye,
-              true,
-              pswNode,
-              TextInputAction.next,
-              null,
-              (value) {}, (value) {
-            FocusScope.of(context).requestFocus(pswConfirmNode);
-          }, () {}, null),
+              viewModel.secretPsw
+                  ? CupertinoIcons.eye
+                  : CupertinoIcons.eye_slash_fill,
+              viewModel.secretPsw,
+              _pswController,
+              TextInputAction.done,
+              () => viewModel.secretPsw = !viewModel.secretPsw,
+              focusNode: _pswNode,
+              onSubmitted: (value) =>
+                  FocusScope.of(context).requestFocus(_pswConfirmNode),
+              onChanged: (_) => onTextChange(viewModel)),
 
           ///确认密码
           _textFieldWidget(
               context,
-              S.of(context).user_psw_confirm,
+              S.of(context).user_psw,
               Icons.lock_outline,
-              CupertinoIcons.eye,
-              true,
-              pswConfirmNode,
+              viewModel.secretPswConfirm
+                  ? CupertinoIcons.eye
+                  : CupertinoIcons.eye_slash_fill,
+              viewModel.secretPswConfirm,
+              _pswConfirmController,
               TextInputAction.done,
-              null,
-              (value) {},
-              (value) {},
-              () {},
-              null),
+              () => viewModel.secretPswConfirm = !viewModel.secretPswConfirm,
+              focusNode: _pswConfirmNode,
+              onChanged: (_) => onTextChange(viewModel)),
 
           const SizedBox(height: 40),
 
           ///注册
-          _registerButtonWidget(context)
+          _registerButtonWidget(context, viewModel)
         ],
       ),
     );
   }
 
   ///注册按钮组件
-  Widget _registerButtonWidget(BuildContext context) {
+  Widget _registerButtonWidget(
+      BuildContext context, RegisterViewModel viewModel) {
     return TextButton(
-      onPressed: () {},
+      onPressed: !viewModel.canRegister
+          ? null
+          : () => actionRegister(context, viewModel),
       style: ButtonStyle(
         ///背景
         backgroundColor: MaterialStateProperty.resolveWith((states) {
@@ -170,16 +265,15 @@ class _RegisterPageState extends State<RegisterPage> {
       IconData prefixIcon,
       IconData suffixIcon,
       bool obscureText,
-      FocusNode? focusNode,
-      TextInputAction? textInputAction,
       TextEditingController? controller,
-      ValueChanged<String>? onChanged,
-      ValueChanged<String>? onFieldSubmitted,
+      TextInputAction? textInputAction,
       VoidCallback onSuffixPressed,
-      FormFieldValidator<String>? validator) {
+      {FocusNode? focusNode,
+      ValueChanged<String>? onSubmitted,
+      ValueChanged<String>? onChanged}) {
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      child: TextFormField(
+      child: TextField(
         controller: controller,
         onChanged: onChanged,
 
@@ -210,8 +304,7 @@ class _RegisterPageState extends State<RegisterPage> {
         //键盘完成按钮样式
         textInputAction: textInputAction,
         //完成按钮事件
-        onFieldSubmitted: onFieldSubmitted,
-        validator: validator,
+        onSubmitted: onSubmitted,
         focusNode: focusNode,
       ),
     );
