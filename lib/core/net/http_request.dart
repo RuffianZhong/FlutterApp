@@ -1,11 +1,10 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import '../../generated/json/base/json_convert_content.dart';
+
 import '../../utils/log_util.dart';
 import '../net/http_config.dart';
 import '../net/observer/http_lifecycle_observer.dart';
-
 import 'cancel/zt_http_cancel.dart';
 
 class HttpRequest {
@@ -91,31 +90,6 @@ class HttpRequest {
     }, onResponse: (Response e, ResponseInterceptorHandler handler) {
       Logger.log("Response:");
       Logger.log(json.encode(e.data));
-
-      /// 以下逻辑直接转换为业务所需的 data
-
-      /// 请求响应的 data
-      dynamic responseData = e.data;
-
-      /// 业务逻辑的 data
-      dynamic serviceData;
-
-      if (responseData is String) {
-        ///指定为String时先转为 map 获取业务 data
-        responseData = json.decode(e.data);
-        serviceData = responseData['data'];
-        e.data = json.encode(serviceData);
-      } else if (responseData is Map) {
-        serviceData = responseData['data'];
-
-        /// 依据泛型是 List 还是 Map(实体) 做不同解析
-        if (serviceData is List) {
-          e.data = JsonConvert.fromJsonAsT(serviceData);
-        } else {
-          e.data = jsonConvert.convert<T>(serviceData);
-        }
-      }
-
       //这里处理结果拦截
       handler.next(e);
     }, onError: (DioError e, ErrorInterceptorHandler handler) {

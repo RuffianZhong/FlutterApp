@@ -1,5 +1,8 @@
 import 'package:flutter_wan_android/generated/json/base/json_convert_content.dart';
 import 'package:flutter_wan_android/modules/main/model/article_entity.dart';
+import 'package:flutter_wan_android/helper/image_helper.dart';
+
+import '../../../generated/json/base/json_convert_content.dart';
 
 
 ArticleEntity $ArticleEntityFromJson(Map<String, dynamic> json) {

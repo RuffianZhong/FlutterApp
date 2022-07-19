@@ -24,8 +24,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m1(main, sub) => "${main} - ${sub}";
 
+  static String m2(progress) => "已学${progress}%";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "account_empty_tip": MessageLookupByLibrary.simpleMessage("请输入账号"),
         "clean_all": MessageLookupByLibrary.simpleMessage("清除全部"),
         "collect": MessageLookupByLibrary.simpleMessage("收藏"),
         "color_theme": MessageLookupByLibrary.simpleMessage("彩色主题"),
@@ -34,12 +37,23 @@ class MessageLookup extends MessageLookupByLibrary {
         "edit": MessageLookupByLibrary.simpleMessage("编辑"),
         "integral": m0,
         "label_group": m1,
+        "language_chinese": MessageLookupByLibrary.simpleMessage("中文"),
+        "language_english": MessageLookupByLibrary.simpleMessage("英文"),
+        "learn_no": MessageLookupByLibrary.simpleMessage("未学习"),
+        "learn_progress": m2,
         "loading_content": MessageLookupByLibrary.simpleMessage("内容加载中..."),
         "login": MessageLookupByLibrary.simpleMessage("登录"),
+        "login_success": MessageLookupByLibrary.simpleMessage("登录成功"),
+        "multi_language": MessageLookupByLibrary.simpleMessage("多语言"),
+        "net_error": MessageLookupByLibrary.simpleMessage("网络错误"),
         "no_account": MessageLookupByLibrary.simpleMessage("还没账号？"),
         "placeholder": MessageLookupByLibrary.simpleMessage("--"),
+        "psw_confirm_empty_tip": MessageLookupByLibrary.simpleMessage("请确认密码"),
+        "psw_confirm_tip": MessageLookupByLibrary.simpleMessage("两次密码不一致"),
+        "psw_empty_tip": MessageLookupByLibrary.simpleMessage("请输入密码"),
         "register": MessageLookupByLibrary.simpleMessage("注册"),
         "register_now": MessageLookupByLibrary.simpleMessage("立即注册"),
+        "register_success": MessageLookupByLibrary.simpleMessage("注册成功"),
         "search_hint": MessageLookupByLibrary.simpleMessage("用空格分隔多个关键词"),
         "search_hot_title": MessageLookupByLibrary.simpleMessage("热门搜索"),
         "search_local_title": MessageLookupByLibrary.simpleMessage("历史搜索"),

@@ -25,5 +25,17 @@
   "edit": "编辑",
   "clean_all": "清除全部",
   "done": "完成",
-  "loading_content": "内容加载中..."
+  "loading_content": "内容加载中...",
+  "learn_progress": "已学{progress}%",
+  "learn_no": "未学习",
+  "multi_language": "多语言",
+  "language_chinese": "中文",
+  "language_english": "英文",
+  "account_empty_tip": "请输入账号",
+  "psw_empty_tip": "请输入密码",
+  "psw_confirm_empty_tip": "请确认密码",
+  "psw_confirm_tip": "两次密码不一致",
+  "login_success": "登录成功",
+  "register_success": "注册成功",
+  "net_error": "网络错误"
 }

@@ -319,6 +319,126 @@ class S {
       args: [],
     );
   }
+
+  /// `已学{progress}%`
+  String learn_progress(Object progress) {
+    return Intl.message(
+      '已学$progress%',
+      name: 'learn_progress',
+      desc: '',
+      args: [progress],
+    );
+  }
+
+  /// `未学习`
+  String get learn_no {
+    return Intl.message(
+      '未学习',
+      name: 'learn_no',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `多语言`
+  String get multi_language {
+    return Intl.message(
+      '多语言',
+      name: 'multi_language',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `中文`
+  String get language_chinese {
+    return Intl.message(
+      '中文',
+      name: 'language_chinese',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `英文`
+  String get language_english {
+    return Intl.message(
+      '英文',
+      name: 'language_english',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `请输入账号`
+  String get account_empty_tip {
+    return Intl.message(
+      '请输入账号',
+      name: 'account_empty_tip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `请输入密码`
+  String get psw_empty_tip {
+    return Intl.message(
+      '请输入密码',
+      name: 'psw_empty_tip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `请确认密码`
+  String get psw_confirm_empty_tip {
+    return Intl.message(
+      '请确认密码',
+      name: 'psw_confirm_empty_tip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `两次密码不一致`
+  String get psw_confirm_tip {
+    return Intl.message(
+      '两次密码不一致',
+      name: 'psw_confirm_tip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `登录成功`
+  String get login_success {
+    return Intl.message(
+      '登录成功',
+      name: 'login_success',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `注册成功`
+  String get register_success {
+    return Intl.message(
+      '注册成功',
+      name: 'register_success',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `网络错误`
+  String get net_error {
+    return Intl.message(
+      '网络错误',
+      name: 'net_error',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

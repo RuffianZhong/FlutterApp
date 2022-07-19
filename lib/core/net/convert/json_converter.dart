@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/generated/json/base/json_convert_content.dart';
+
 ///
 /// 数据转换逻辑参考 generated > json > base > json_convert_content.dart
 ///

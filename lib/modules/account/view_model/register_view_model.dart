@@ -20,7 +20,7 @@ class RegisterViewModel extends ChangeNotifier {
   }
 
   ///密码模式
-  bool _secretPsw = false;
+  bool _secretPsw = true;
 
   bool get secretPsw => _secretPsw;
 
@@ -30,7 +30,7 @@ class RegisterViewModel extends ChangeNotifier {
   }
 
   ///确认密码模式
-  bool _secretPswConfirm = false;
+  bool _secretPswConfirm = true;
 
   bool get secretPswConfirm => _secretPswConfirm;
 

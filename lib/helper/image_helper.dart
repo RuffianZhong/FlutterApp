@@ -29,7 +29,7 @@ class ImageHelper {
   /// imageUrl：图片地址
   /// placeholder：加载中占位符
   /// errorWidget：加载失败占位符
-  static Widget load(String imageUrl,
+  static Widget network(String imageUrl,
       {double? height,
       double? width,
       BoxFit? fit,
@@ -45,6 +45,19 @@ class ImageHelper {
       errorWidget: (context, url, error) => errorWidget,
       height: height,
       width: width,
+      fit: fit,
+    );
+  }
+
+  /// 加载 assets 图片
+  /// url资源名称
+  static Widget assets(String name,
+      {double? height, double? width, BoxFit? fit, Color? color}) {
+    return Image.asset(
+      ImageHelper.wrapAssets(name),
+      height: height,
+      width: width,
+      color: color,
       fit: fit,
     );
   }

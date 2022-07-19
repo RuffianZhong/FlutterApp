@@ -11,5 +11,5 @@ class HttpCanceler implements Canceler {
   HttpCanceler(this.lifecycleOwner,
       {CancelToken? cancelToken, WidgetLifecycleState? lifecycleState})
       : cancelToken = cancelToken ?? CancelToken(),
-        lifecycleState = lifecycleState ?? WidgetLifecycleState.onStop;
+        lifecycleState = lifecycleState ?? WidgetLifecycleState.onDestroy;
 }

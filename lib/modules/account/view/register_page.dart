@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/common/global_value.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_wan_android/utils/log_util.dart';
+import 'package:flutter_wan_android/utils/toast_util.dart';
+import 'package:flutter_wan_android/widget/loading_dialog_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/net/cancel/http_canceler.dart';
@@ -57,37 +60,47 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
     String pswConfirm = _pswConfirmController.text.trim();
 
     if (account.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).account_empty_tip);
+      ToastUtil.showToast(msg: S.of(context).account_empty_tip);
       return;
     }
     if (psw.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).psw_empty_tip);
+      ToastUtil.showToast(msg: S.of(context).psw_empty_tip);
       return;
     }
 
     if (pswConfirm.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).psw_confirm_empty_tip);
+      ToastUtil.showToast(msg: S.of(context).psw_confirm_empty_tip);
       return;
     }
 
     if (Comparable.compare(psw, pswConfirm) != 0) {
-      Fluttertoast.showToast(msg: S.of(context).psw_confirm_tip);
+      ToastUtil.showToast(msg: S.of(context).psw_confirm_tip);
       return;
     }
 
+    LoadingDialogHelper.showLoading(context);
+
+    ///注册
     viewModel.model
         .register(account, psw, pswConfirm, HttpCanceler(this))
-        .then((value) {
-      // viewModel.loginSuccess(value);
-      Fluttertoast.showToast(msg: "登录成功");
-    }).onError((error, stackTrace) {
-      Fluttertoast.showToast(msg: "登录失败");
-    });
+        .then((result) {
+          if (result.success) {
+            ToastUtil.showToast(msg: S.of(context).register_success);
+            actionBack(context, result: account); //回到登录页面
+            //viewModel.model.saveUserData(result.data!);
+            //RouterHelper.popUntil(context, ""); //直接回到首页
+          } else {
+            ToastUtil.showToast(msg: result.msg ?? "");
+          }
+        })
+        .onError((error, stackTrace) =>
+            ToastUtil.showToast(msg: S.of(context).net_error))
+        .whenComplete(() => LoadingDialogHelper.dismissLoading(context));
   }
 
   ///返回操作
-  void actionBack(BuildContext context, bool isLogin) {
-    RouterHelper.pop<bool>(context, isLogin);
+  void actionBack(BuildContext context, {String? result}) {
+    RouterHelper.pop<String>(context, result);
   }
 
   ///输入框值改变
@@ -129,9 +142,9 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
         left: 20,
         top: ScreenUtil.get().appBarHeight,
         child: GestureDetector(
-          onTap: () => actionBack(context, false),
+          onTap: () => actionBack(context),
           child: const Icon(
-            Icons.close,
+            Icons.arrow_back,
             color: Colors.white,
             size: 30,
           ),
@@ -190,7 +203,7 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
                   : CupertinoIcons.eye_slash_fill,
               viewModel.secretPsw,
               _pswController,
-              TextInputAction.done,
+              TextInputAction.next,
               () => viewModel.secretPsw = !viewModel.secretPsw,
               focusNode: _pswNode,
               onSubmitted: (value) =>

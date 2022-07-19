@@ -2,16 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_wan_android/core/net/http_result.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
+import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 import 'package:flutter_wan_android/modules/account/view_model/login_view_model.dart';
 import 'package:flutter_wan_android/utils/screen_util.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_wan_android/utils/toast_util.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../generated/l10n.dart';
 import '../../../res/color_res.dart';
+import '../../../utils/log_util.dart';
+import '../../../widget/loading_dialog_helper.dart';
 
 ///登录页面
 class LoginPage extends StatefulWidget {
@@ -21,7 +25,16 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ZTLifecycleState<LoginPage> {
+class _LoginPageState extends ZTLifecycleState<LoginPage>
+    with WidgetLifecycleObserver {
+  late BuildContext _buildContext;
+
+  @override
+  void initState() {
+    super.initState();
+    getLifecycle().addObserver(this);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -29,6 +42,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage> {
           ChangeNotifierProvider(create: (context) => LoginViewModel())
         ],
         child: Consumer<LoginViewModel>(builder: (context, viewModel, child) {
+          _buildContext = context;
           return Scaffold(
             body: _bodyContent(context, viewModel),
           );
@@ -40,23 +54,40 @@ class _LoginPageState extends ZTLifecycleState<LoginPage> {
     String account = _accountController.text;
     String psw = _pswController.text;
     if (account.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).account_empty_tip);
+      ToastUtil.showToast(msg: S.of(context).account_empty_tip);
       return;
     }
     if (psw.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).psw_empty_tip);
+      ToastUtil.showToast(msg: S.of(context).psw_empty_tip);
     }
-    viewModel.model.login(account, psw, HttpCanceler(this)).then((value) {
-      viewModel.loginSuccess(value);
-      Fluttertoast.showToast(msg: "登录成功");
-    }).onError((error, stackTrace) {
-      Fluttertoast.showToast(msg: "登录失败");
-    });
+
+    LoadingDialogHelper.showLoading(context);
+
+    ///登录
+    viewModel.model
+        .login(account, psw, HttpCanceler(this))
+        .then((result) {
+          if (result.success) {
+            ToastUtil.showToast(msg: S.of(context).login_success);
+            viewModel.model.saveUserData(result.data!);
+            actionBack(context, true);
+          } else {
+            ToastUtil.showToast(msg: result.msg ?? "");
+          }
+        })
+        .onError((error, stackTrace) =>
+            ToastUtil.showToast(msg: S.of(context).net_error))
+        .whenComplete(() => LoadingDialogHelper.dismissLoading(context));
   }
 
   ///注册
   void actionRegister(BuildContext context) {
-    RouterHelper.pushNamed(context, RouterConfig.registerPage);
+    RouterHelper.pushNamed(context, RouterConfig.registerPage).then((value) {
+      Logger.log("-----pushNamed----$value");
+      if (value != null) {
+        initData(context, account: value);
+      }
+    });
   }
 
   ///返回操作
@@ -70,6 +101,17 @@ class _LoginPageState extends ZTLifecycleState<LoginPage> {
     String psw = _pswController.text;
 
     viewModel.canLogin = account.isNotEmpty && psw.isNotEmpty;
+  }
+
+  ///初始化数据
+  void initData(BuildContext context, {String? account}) async {
+    account ??= await context.read<LoginViewModel>().model.getUserAccount();
+
+    if (account != null && account.isNotEmpty) {
+      _accountController.text = account;
+      _accountController.selection =
+          TextSelection.collapsed(offset: account.length);
+    }
   }
 
   Widget _bodyContent(BuildContext context, LoginViewModel viewModel) {
@@ -150,30 +192,31 @@ class _LoginPageState extends ZTLifecycleState<LoginPage> {
         children: [
           ///账号
           _textFieldWidget(
-              context,
-              S.of(context).user_name,
-              Icons.perm_identity,
-              CupertinoIcons.clear,
-              false,
-              _accountController,
-              TextInputAction.next,
-              () => _accountController.clear(),
+              context: context,
+              hintText: S.of(context).user_name,
+              prefixIcon: Icons.perm_identity,
+              suffixIcon: CupertinoIcons.clear,
+              obscureText: false,
+              controller: _accountController,
+              textInputAction: TextInputAction.next,
+              onSuffixPressed: () => _accountController.clear(),
               onSubmitted: (value) =>
                   FocusScope.of(context).requestFocus(_pswNode),
               onChanged: (_) => onTextChange(viewModel)),
 
           ///密码
           _textFieldWidget(
-              context,
-              S.of(context).user_psw,
-              Icons.lock_outline,
-              viewModel.obscureText
+              context: context,
+              hintText: S.of(context).user_psw,
+              prefixIcon: Icons.lock_outline,
+              suffixIcon: viewModel.obscureText
                   ? CupertinoIcons.eye
                   : CupertinoIcons.eye_slash_fill,
-              viewModel.obscureText,
-              _pswController,
-              TextInputAction.done,
-              () => viewModel.obscureText = !viewModel.obscureText,
+              obscureText: viewModel.obscureText,
+              controller: _pswController,
+              textInputAction: TextInputAction.done,
+              onSuffixPressed: () =>
+                  viewModel.obscureText = !viewModel.obscureText,
               focusNode: _pswNode,
               onChanged: (_) => onTextChange(viewModel)),
 
@@ -223,15 +266,15 @@ class _LoginPageState extends ZTLifecycleState<LoginPage> {
 
   ///输入框组件
   Widget _textFieldWidget(
-      BuildContext context,
-      String hintText,
-      IconData prefixIcon,
-      IconData suffixIcon,
-      bool obscureText,
-      TextEditingController? controller,
-      TextInputAction? textInputAction,
-      VoidCallback onSuffixPressed,
-      {FocusNode? focusNode,
+      {required BuildContext context,
+      required String hintText,
+      required IconData prefixIcon,
+      required IconData suffixIcon,
+      required bool obscureText,
+      required TextEditingController controller,
+      required TextInputAction textInputAction,
+      required VoidCallback onSuffixPressed,
+      FocusNode? focusNode,
       ValueChanged<String>? onSubmitted,
       ValueChanged<String>? onChanged}) {
     return Container(
@@ -290,5 +333,12 @@ class _LoginPageState extends ZTLifecycleState<LoginPage> {
         ])),
       ),
     );
+  }
+
+  @override
+  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
+    if (state == WidgetLifecycleState.onCreate) {
+      initData(_buildContext);
+    }
   }
 }

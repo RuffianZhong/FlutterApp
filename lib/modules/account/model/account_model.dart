@@ -1,7 +1,9 @@
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 
+import '../../../common/global_value.dart';
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../core/net/http_request.dart';
+import '../../../core/net/http_result.dart';
 
 class AccountModel {
   ///登录
@@ -14,29 +16,48 @@ class AccountModel {
   String logoutApi = "user/logout/json";
 
   ///登录
-  Future<UserEntity> login(
+  Future<HttpResult<UserEntity>> login(
       String account, String psw, HttpCanceler? canceler) async {
-    //username，password
+    ///参数
     Map<String, dynamic>? params = {"username": account, "password": psw};
-    return await HttpRequest.post<UserEntity>(loginApi,
-        params: params, canceler: canceler);
+
+    ///结果
+    Map<String, dynamic> value =
+        await HttpRequest.post(loginApi, params: params, canceler: canceler);
+
+    return HttpResult<UserEntity>().convert(value);
   }
 
   ///注册
-  Future<UserEntity> register(String account, String psw, String confirmPsw,
-      HttpCanceler? canceler) async {
-    //username，password repassword
+  Future<HttpResult<UserEntity>> register(String account, String psw,
+      String confirmPsw, HttpCanceler? canceler) async {
+    ///参数
     Map<String, dynamic>? params = {
       "username": account,
       "password": psw,
       "repassword": confirmPsw
     };
-    return await HttpRequest.post<UserEntity>(registerApi,
-        params: params, canceler: canceler);
+
+    ///结果
+    Map<String, dynamic> value =
+        await HttpRequest.post(registerApi, params: params, canceler: canceler);
+
+    return HttpResult<UserEntity>().convert(value);
   }
 
   ///退出登录
-  Future<UserEntity> logout(HttpCanceler? canceler) async {
-    return await HttpRequest.post<UserEntity>(registerApi, canceler: canceler);
+  Future logout(HttpCanceler? canceler) async {
+    return await HttpRequest.post(registerApi, canceler: canceler);
+  }
+
+  ///保存登录数据
+  void saveUserData(UserEntity entity) {
+    GlobalValue.setLoginState(entity.uid ?? 0);
+    GlobalValue.setUserAccount(entity.nickname ?? "");
+  }
+
+  ///获取账号信息
+  Future<String?> getUserAccount() async {
+    return await GlobalValue.getUserAccount();
   }
 }
