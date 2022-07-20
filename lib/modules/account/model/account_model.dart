@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 
 import '../../../common/global_value.dart';
@@ -46,18 +48,29 @@ class AccountModel {
   }
 
   ///退出登录
-  Future logout(HttpCanceler? canceler) async {
-    return await HttpRequest.post(registerApi, canceler: canceler);
+  Future<HttpResult> logout(HttpCanceler? canceler) async {
+    ///结果
+    Map<String, dynamic> value =
+        await HttpRequest.get(logoutApi, canceler: canceler);
+
+    return HttpResult().convert(value);
   }
 
   ///保存登录数据
-  void saveUserData(UserEntity entity) {
+  void saveUser(UserEntity entity) {
     GlobalValue.setLoginState(entity.uid ?? 0);
-    GlobalValue.setUserAccount(entity.nickname ?? "");
+    GlobalValue.setUserJson(entity.toString());
   }
 
   ///获取账号信息
-  Future<String?> getUserAccount() async {
-    return await GlobalValue.getUserAccount();
+  Future<UserEntity> getUser() async {
+    String? jsonStr = await GlobalValue.getUserJson();
+    dynamic jsonMap = jsonDecode(jsonStr ?? "{}");
+    return UserEntity.fromJson(jsonMap);
+  }
+
+  ///是否已经登录
+  Future<bool> isLogin() async {
+    return await GlobalValue.isLogin();
   }
 }

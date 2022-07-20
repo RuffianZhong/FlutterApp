@@ -2,7 +2,7 @@ import 'package:flutter_wan_android/utils/shared_preferences_utils.dart';
 
 class GlobalValue {
   static const String spUid = "spUid";
-  static const String spUAccount = "spUAccount";
+  static const String spUser = "spUser";
 
   ///用户是否已经登录
   static Future<bool> isLogin() async {
@@ -16,13 +16,13 @@ class GlobalValue {
     await SPUtils.getInstance().setInt(spUid, uid);
   }
 
-  ///保存用户账号
-  static void setUserAccount(String account) async {
-    await SPUtils.getInstance().setString(spUAccount, account);
+  ///保存用户信息
+  static void setUserJson(String userJson) async {
+    await SPUtils.getInstance().setString(spUser, userJson);
   }
 
-  ///获取用户账号
-  static Future<String?> getUserAccount() async {
-    return await SPUtils.getInstance().getString(spUAccount);
+  ///获取用户信息
+  static Future<String?> getUserJson() async {
+    return await SPUtils.getInstance().getString(spUser);
   }
 }

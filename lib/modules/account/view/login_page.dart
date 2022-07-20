@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
@@ -69,7 +71,9 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
         .then((result) {
           if (result.success) {
             ToastUtil.showToast(msg: S.of(context).login_success);
-            viewModel.model.saveUserData(result.data!);
+
+            viewModel.model.saveUser(result.data!);
+
             actionBack(context, true);
           } else {
             ToastUtil.showToast(msg: result.msg ?? "");
@@ -91,7 +95,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
   }
 
   ///返回操作
-  void actionBack(BuildContext context, bool isLogin) {
+  void actionBack(BuildContext context1, bool isLogin) {
     RouterHelper.pop<bool>(context, isLogin);
   }
 
@@ -105,7 +109,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
 
   ///初始化数据
   void initData(BuildContext context, {String? account}) async {
-    account ??= await context.read<LoginViewModel>().model.getUserAccount();
+    account ??= (await context.read<LoginViewModel>().model.getUser()).nickname;
 
     if (account != null && account.isNotEmpty) {
       _accountController.text = account;

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 
+import '../../account/model/account_model.dart';
+
 /// me页面的ViewModel
 class MeViewModel extends ChangeNotifier {
-  ///测试数据
-  String _name = "";
+  late AccountModel model;
 
-  String get name => _name;
-
-  set name(String value) {
-    _name = value;
-    notifyListeners();
+  MeViewModel() {
+    model = AccountModel();
   }
 
   ///用户信息实体类
@@ -20,6 +18,16 @@ class MeViewModel extends ChangeNotifier {
 
   set userEntity(UserEntity value) {
     _userEntity = value;
+    notifyListeners();
+  }
+
+  ///是否已经登录
+  bool _isLogin = false;
+
+  bool get isLogin => _isLogin;
+
+  set isLogin(bool value) {
+    _isLogin = value;
     notifyListeners();
   }
 }

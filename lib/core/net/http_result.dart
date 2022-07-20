@@ -1,6 +1,7 @@
 import '../../generated/json/base/json_convert_content.dart';
 
 ///网络请求结果
+///泛型是最终实体类型，如果想要 List<T> 只需要指定 T 然后获取 list 对应的值即可
 class HttpResult<T> {
   late int code;
   String? msg;
@@ -30,9 +31,9 @@ class HttpResult<T> {
 
     /// 解析成为 List
     if (data is List) {
-      entity.list = _convertList(data);
+      entity.list = convertList(data);
     } else {
-      entity.data = _convertData(data);
+      entity.data = convertData(data);
     }
 
     entity.code = code;
@@ -41,7 +42,7 @@ class HttpResult<T> {
   }
 
   ///转为List
-  List<T> _convertList(dynamic data) {
+  List<T> convertList(dynamic data) {
     List<T> list = [];
     for (var item in data) {
       list.add(jsonConvert.convert<T>(item) as T);
@@ -50,7 +51,7 @@ class HttpResult<T> {
   }
 
   ///转为具体数据
-  T? _convertData(dynamic data) {
+  T? convertData(dynamic data) {
     return jsonConvert.convert<T>(data);
   }
 }

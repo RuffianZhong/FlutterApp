@@ -80,6 +80,7 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
 
     LoadingDialogHelper.showLoading(context);
 
+
     ///注册
     viewModel.model
         .register(account, psw, pswConfirm, HttpCanceler(this))

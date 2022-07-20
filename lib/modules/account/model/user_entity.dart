@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_wan_android/generated/json/base/json_field.dart';
 import 'package:flutter_wan_android/generated/json/user_entity.g.dart';
-import 'dart:convert';
+import 'package:flutter_wan_android/helper/image_helper.dart';
 
 @JsonSerializable()
 class UserEntity {
@@ -12,10 +14,15 @@ class UserEntity {
   int? coinCount = 0;
   String? icon = "";
 
-  UserEntity({this.uid, this.nickname});
+  UserEntity();
 
-  factory UserEntity.fromJson(Map<String, dynamic> json) =>
-      $UserEntityFromJson(json);
+  factory UserEntity.fromJson(Map<String, dynamic> json) {
+    ///手动添加头像
+    if (!json.containsKey("icon")) {
+      json["icon"] = ImageHelper.randomUrl();
+    }
+    return $UserEntityFromJson(json);
+  }
 
   Map<String, dynamic> toJson() => $UserEntityToJson(this);
 

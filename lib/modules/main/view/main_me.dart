@@ -1,14 +1,22 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/generated/l10n.dart';
+import 'package:flutter_wan_android/helper/image_helper.dart';
+import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
+import 'package:flutter_wan_android/modules/account/view/login_page.dart';
+import 'package:flutter_wan_android/modules/main/view/preview_page.dart';
 import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
 import 'package:flutter_wan_android/utils/screen_util.dart';
+import 'package:flutter_wan_android/utils/toast_util.dart';
+import 'package:flutter_wan_android/widget/loading_dialog_helper.dart';
 import 'package:provider/provider.dart';
 
+import '../../../config/hero_config.dart';
+import '../../../core/net/cancel/http_canceler.dart';
 import '../../../res/color_res.dart';
+import '../../../utils/log_util.dart';
 
 class MainMePage extends StatefulWidget {
   const MainMePage({Key? key}) : super(key: key);
@@ -19,9 +27,6 @@ class MainMePage extends StatefulWidget {
 
 class _MainMePageState extends ZTLifecycleState<MainMePage>
     with AutomaticKeepAliveClientMixin, WidgetLifecycleObserver {
-  final String iconUrl =
-      "https://img2.baidu.com/it/u=1994380678,3283034272&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657040400&t=4cc7ef8232b3a054dbac4544187c0a05";
-
   @override
   void initState() {
     super.initState();
@@ -31,19 +36,70 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return _bodyContent(context);
+
+    return Scaffold(body: Consumer<MeViewModel>(
+      builder: (context, viewModel, child) {
+        return _bodyContent(context, viewModel);
+      },
+    ));
   }
 
-  Widget _bodyContent(BuildContext context) {
+  ///退出登录
+  void actionLogout(BuildContext context, MeViewModel viewModel) {
+    LoadingDialogHelper.showLoading(context);
+    viewModel.model
+        .logout(HttpCanceler(this))
+        .then((value) {
+          if (value.success) {
+            viewModel.isLogin = false;
+            viewModel.model.saveUser(UserEntity());
+          }
+        })
+        .onError((error, stackTrace) =>
+            ToastUtil.showToast(msg: S.of(context).net_error))
+        .whenComplete(() => LoadingDialogHelper.dismissLoading(context));
+  }
+
+  ///用户头像事件
+  void actionUserIcon(BuildContext context, MeViewModel viewModel) {
+    if (viewModel.isLogin) {
+      ///放大
+      RouterHelper.push(context, PreviewPage(viewModel.userEntity.icon ?? ""),
+          fullscreenDialog: true);
+    } else {
+      ///去登录
+      RouterHelper.push(context, const LoginPage(), fullscreenDialog: true)
+          .then((value) {
+        Logger.log("---------me-------------$value");
+
+        ///刷新用户数据
+        refreshUserData(viewModel);
+      });
+    }
+  }
+
+  ///刷新用户数据
+  void refreshUserData(MeViewModel viewModel) async {
+    viewModel.isLogin = await viewModel.model.isLogin();
+
+    if (viewModel.isLogin) {
+      viewModel.userEntity = await viewModel.model.getUser();
+    }
+  }
+
+  Widget _bodyContent(BuildContext context, MeViewModel viewModel) {
     return SingleChildScrollView(
       child: Column(
-        children: [_headerContent(context), _centerContent(context)],
+        children: [
+          _headerContent(context, viewModel),
+          _centerContent(context, viewModel)
+        ],
       ),
     );
   }
 
   /// 头部内容
-  Widget _headerContent(BuildContext context) {
+  Widget _headerContent(BuildContext context, MeViewModel viewModel) {
     double topBarHeight =
         ScreenUtil.get().appBarHeight + ScreenUtil.get().statusBarHeight;
 
@@ -62,12 +118,23 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
                   SizedBox(height: topBarHeight),
 
                   ///圆形头像
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(45),
-                    child: CachedNetworkImage(
-                      imageUrl: iconUrl,
-                      height: 90,
-                      width: 90,
+                  GestureDetector(
+                    onTap: () => actionUserIcon(context, viewModel),
+                    child: Hero(
+                      tag: HeroConfig.tagPreview,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(45),
+                        child: viewModel.isLogin
+                            ? ImageHelper.network(
+                                viewModel.userEntity.icon ?? "",
+                                height: 90,
+                                width: 90)
+                            : const Icon(
+                                Icons.account_circle,
+                                size: 90,
+                                color: Colors.white,
+                              ),
+                      ),
                     ),
                   ),
 
@@ -75,8 +142,10 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
 
                   ///昵称
                   Text(
-                      viewModel.userEntity.nickname ??
-                          S.of(context).placeholder,
+                      viewModel.isLogin
+                          ? viewModel.userEntity.nickname ??
+                              S.of(context).placeholder
+                          : S.of(context).login,
                       style: const TextStyle(
                           fontSize: 18,
                           color: Colors.white,
@@ -85,13 +154,16 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
                   const SizedBox(height: 20),
 
                   ///积分
-                  Text(
-                      S.of(context).integral(viewModel.userEntity.uid ??
-                          S.of(context).placeholder),
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          decoration: TextDecoration.underline)),
+                  Visibility(
+                    visible: viewModel.isLogin,
+                    child: Text(
+                        S.of(context).integral(viewModel.userEntity.coinCount ??
+                            S.of(context).placeholder),
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            decoration: TextDecoration.underline)),
+                  ),
 
                   const SizedBox(height: 30),
                 ],
@@ -99,16 +171,19 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
 
               /// 退出登录
               Positioned(
-                  right: 20,
-                  top: topBarHeight - ScreenUtil.get().appBarHeight / 2 - 12,
+                right: 20,
+                top: topBarHeight - ScreenUtil.get().appBarHeight / 2 - 12,
+                child: Offstage(
+                  offstage: !viewModel.isLogin,
                   child: GestureDetector(
-                    onTap: () {},
-                    child: const Icon(
-                      Icons.exit_to_app,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  )),
+                      onTap: () => actionLogout(context, viewModel),
+                      child: const Icon(
+                        Icons.exit_to_app,
+                        color: Colors.white,
+                        size: 24,
+                      )),
+                ),
+              ),
             ],
           );
         },
@@ -117,7 +192,7 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
   }
 
   /// 中间列表内容
-  Widget _centerContent(BuildContext context) {
+  Widget _centerContent(BuildContext context, MeViewModel viewModel) {
     return Column(
       children: [
         ///收藏
@@ -135,11 +210,16 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
             Theme.of(context).brightness == Brightness.dark),
 
         ///彩色主题
-        _itemWidgetSettingTheme(context, () {}),
+        _itemWidgetExpansion(S.of(context).color_theme, Icons.color_lens,
+            _itemChildTheme(() {})),
+
+        ///多语言
+        _itemWidgetExpansion(S.of(context).multi_language, Icons.language,
+            _itemChildLanguage((value) {})),
 
         ///设置
-        _itemWidgetDefault(context, () {}, Icons.settings,
-            S.of(context).settings, Icons.chevron_right),
+        /*_itemWidgetDefault(context, () {}, Icons.settings,
+            S.of(context).settings, Icons.chevron_right),*/
       ],
     );
   }
@@ -164,7 +244,7 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
         ));
   }
 
-  /// 列表item：默认样式
+  /// 列表item：开关样式
   Widget _itemWidgetSwitch(BuildContext context, ValueChanged<bool> onChanged,
       IconData leftIcon, String title, bool switchValue) {
     return InkWell(
@@ -186,36 +266,72 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
         ));
   }
 
-  /// 列表item：设置主题
-  Widget _itemWidgetSettingTheme(
-      BuildContext context, GestureTapCallback onTap) {
+  /// 列表item：抽屉式
+  Widget _itemWidgetExpansion(String title, IconData icon, Widget child) {
     ///向下扩展/收缩布局
     return ExpansionTile(
-      title: Text(S.of(context).color_theme),
-      leading: const Icon(Icons.color_lens),
+      title: Text(title),
+      leading: Icon(icon),
       children: [
         ///内间距
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
 
-          ///流式布局
-          child: Wrap(
-            spacing: 5,
-            runSpacing: 5,
-            children: [
-              /// ... 适配类型？？
-              ...Colors.primaries.map((color) {
-                ///指定形状
-                return Material(
-                  color: color,
-                  child: InkWell(
-                    onTap: onTap,
-                    child: const SizedBox(height: 40, width: 40),
-                  ),
-                );
-              }).toList()
-            ],
-          ),
+          ///子布局
+          child: child,
+        )
+      ],
+    );
+  }
+
+  ///彩色主题
+  Widget _itemChildTheme(GestureTapCallback onTap) {
+    ///流式布局
+    return Wrap(
+      spacing: 5,
+      runSpacing: 5,
+      children: [
+        /// ... 适配类型？？
+        ...Colors.primaries.map((color) {
+          ///指定形状
+          return Material(
+            color: color,
+            child: InkWell(
+              onTap: onTap,
+              child: const SizedBox(height: 40, width: 40),
+            ),
+          );
+        }).toList()
+      ],
+    );
+  }
+
+  int groupValue = 0;
+
+  ///多语言
+  Widget _itemChildLanguage(ValueChanged<int?>? onChanged) {
+    return Column(
+      children: [
+        ///中文
+        Row(
+          children: [
+            Radio(value: 0, groupValue: groupValue, onChanged: onChanged),
+            Text(
+              S.of(context).language_chinese,
+              style: const TextStyle(fontSize: 14),
+            )
+          ],
+        ),
+
+        ///英文
+        Row(
+          children: [
+            Radio(value: 1, groupValue: groupValue, onChanged: onChanged),
+            Text(
+              S.of(context).language_english,
+              style: const TextStyle(fontSize: 14),
+            )
+          ],
         )
       ],
     );
@@ -230,7 +346,7 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
       /// 首帧绘制完成
       /// 初始化数据
       MeViewModel viewModel = context.read<MeViewModel>();
-      viewModel.userEntity = UserEntity(uid: 0, nickname: S.of(context).login);
+      refreshUserData(viewModel);
     }
   }
 }
