@@ -4,7 +4,6 @@ import 'package:flutter_wan_android/core/net/cancel/zt_http_cancel.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
 import 'package:flutter_wan_android/modules/search/model/search_model.dart';
 
-import '../../../utils/log_util.dart';
 import '../../main/model/article_entity.dart';
 
 ///SearchViewModel
@@ -36,7 +35,11 @@ class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   }
 
   void getHotKeyFromServer() async {
-    model.getHotKeyFromServer().then((value) => serverLabels = value);
+    model.getHotKeyFromServer().then((value) {
+      if (value.success) {
+        serverLabels = value.list;
+      }
+    });
   }
 
   ///本地标签
@@ -76,7 +79,9 @@ class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   ///搜索内容
   void getContentFromServer(String key, WidgetLifecycleOwner lifecycleOwner) {
     model.getContentFromServer(key, HttpCanceler(lifecycleOwner)).then((value) {
-      articleList = value.datas;
+      if (value.success) {
+        articleList = value.list!;
+      }
     });
   }
 

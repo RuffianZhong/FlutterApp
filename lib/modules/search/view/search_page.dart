@@ -1,7 +1,7 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_wan_android/config/route_config.dart';
+import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
@@ -187,7 +187,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
         itemBuilder: (context, index) {
           return GestureDetector(
               onTap: () {
-                RouterHelper.pushNamed(context, RouteConfig.articleDetailsPage,
+                RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
                     arguments: viewModel.articleList[index]);
               },
               child: ItemContentWidget(article: viewModel.articleList[index]));
