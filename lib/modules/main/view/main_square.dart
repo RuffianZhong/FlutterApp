@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
-import 'package:flutter_wan_android/utils/log_util.dart';
 import 'package:provider/provider.dart';
 
-List<String> imageUrl = [
-  "https://img2.baidu.com/it/u=1994380678,3283034272&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657213200&t=d57830e0ca280cc0f87fdbf10b25305b",
-  "https://img2.baidu.com/it/u=2860188096,638334621&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657213200&t=cc435e450717a2beb0623dd45752f75f",
-  "https://img1.baidu.com/it/u=592570905,1313515675&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657213200&t=1d3fe5d6db1996aa3b45c8636347869d",
-  "https://img2.baidu.com/it/u=4244269751,4000533845&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657213200&t=9e3bbec87e572ee9bf269a018c71e0ac",
-  "https://img1.baidu.com/it/u=2029513305,2137933177&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657213200&t=fc9d00fc14a8feeb19be958ba428ecba",
-  "https://img0.baidu.com/it/u=1694074520,2517635995&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1657472400&t=3b8cee3f0f6a844e69f3b43dff3d8465"
-];
+import '../../../generated/l10n.dart';
+import '../../book/model/book_entity.dart';
+import '../view_model/square_view_model.dart';
 
 class MainSquarePage extends StatefulWidget {
   const MainSquarePage({Key? key}) : super(key: key);
@@ -22,6 +16,8 @@ class MainSquarePage extends StatefulWidget {
 
 class _MainSquarePageState extends ZTLifecycleState<MainSquarePage>
     with AutomaticKeepAliveClientMixin, WidgetLifecycleObserver {
+  late BuildContext _buildContext;
+
   @override
   void initState() {
     super.initState();
@@ -30,16 +26,17 @@ class _MainSquarePageState extends ZTLifecycleState<MainSquarePage>
 
   @override
   Widget build(BuildContext context) {
-    Logger.log("Square----build");
+    super.build(context);
     return Scaffold(
         appBar: AppBar(
-          title: Text("书籍教程"),
+          title: Text(S.of(context).tab_book_course),
         ),
         body: bodyContent());
   }
 
   Widget bodyContent() {
     return Consumer<SquareViewModel>(builder: (context, viewModel, child) {
+      _buildContext = context;
       return GridView.builder(
           padding: const EdgeInsets.all(15),
           itemCount: viewModel.dataArray.length,
@@ -54,10 +51,10 @@ class _MainSquarePageState extends ZTLifecycleState<MainSquarePage>
     });
   }
 
-  Widget itemWidget(BookEntity bookEntity) {
+  Widget itemWidget(BookEntity entity) {
     return ClipRRect(
         borderRadius: BorderRadius.circular(4),
-        child: ImageHelper.load(bookEntity.image, fit: BoxFit.cover));
+        child: ImageHelper.network(entity.cover, fit: BoxFit.cover));
   }
 
   @override
@@ -66,31 +63,8 @@ class _MainSquarePageState extends ZTLifecycleState<MainSquarePage>
   @override
   void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
     if (state == WidgetLifecycleState.onCreate) {
-      List<BookEntity> list = [];
-      for (var image in imageUrl) {
-        list.add(BookEntity(image));
-      }
-
-      Logger.log(list);
-      SquareViewModel viewModel = context.read<SquareViewModel>();
-      viewModel.dataArray = list;
+      SquareViewModel viewModel = _buildContext.read<SquareViewModel>();
+      viewModel.getBookList(owner);
     }
   }
-}
-
-class SquareViewModel extends ChangeNotifier {
-  List<BookEntity> _dataArray = [];
-
-  List<BookEntity> get dataArray => _dataArray;
-
-  set dataArray(List<BookEntity> value) {
-    _dataArray = value;
-    notifyListeners();
-  }
-}
-
-class BookEntity {
-  String image;
-
-  BookEntity(this.image);
 }

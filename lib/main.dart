@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
-import 'package:flutter_wan_android/modules/main/view/banner_widget.dart';
 import 'package:flutter_wan_android/modules/main/view/main_home.dart';
 import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
 import 'package:flutter_wan_android/res/color_res.dart';
 import 'package:provider/provider.dart';
 
-import 'config/route_config.dart';
+import 'config/router_config.dart';
 import 'core/lifecycle/zt_lifecycle.dart';
 import 'generated/l10n.dart';
 import 'modules/main/view/main_knowledge.dart';
@@ -15,7 +14,9 @@ import 'modules/main/view/main_me.dart';
 import 'modules/main/view/main_project.dart';
 import 'modules/main/view/main_square.dart';
 import 'modules/main/view_model/home_view_model.dart';
-import 'modules/search/view/search_page.dart';
+import 'modules/main/view_model/knowledge_view_model.dart';
+import 'modules/main/view_model/project_view_model.dart';
+import 'modules/main/view_model/square_view_model.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,16 +43,18 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [WidgetRouteObserver.routeObserver],
 
       ///路由表配置
-      routes: RouteConfig.routes,
+      routes: RouterConfig.routes,
 
       title: 'WanAndroid',
       theme: ThemeData(
         primarySwatch: ColorRes.theme,
       ),
-      home: SearchPage(),
-      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      //home: BookDetailsPage(),
+      //home: SearchPage(),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
       // home: const (),
       // home: const RegisterPage(),
+      //home: LoginPage(),
     );
   }
 }
@@ -84,7 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (context) => MeViewModel()),
-          ChangeNotifierProvider(create: (context) => BannerViewModel()),
           ChangeNotifierProvider(create: (context) => ProjectViewModel()),
           ChangeNotifierProvider(create: (context) => KnowledgeViewModel()),
           ChangeNotifierProvider(create: (context) => SquareViewModel()),
@@ -135,7 +137,8 @@ class _MyHomePageState extends State<MyHomePage> {
         _bottomNavigationBarItem(
             S.of(context).tab_project, "ic_tab_project.png"),
         _bottomNavigationBarItem(S.of(context).tab_square, "ic_tab_square.png"),
-        _bottomNavigationBarItem(S.of(context).tab_wechat, "ic_tab_wechat.png"),
+        _bottomNavigationBarItem(
+            S.of(context).tab_knowledge, "ic_tab_wechat.png"),
         _bottomNavigationBarItem(S.of(context).tab_me, "ic_tab_me.png"),
       ],
       selectedItemColor: ColorRes.themeMain,

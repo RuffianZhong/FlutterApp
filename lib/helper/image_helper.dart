@@ -35,18 +35,28 @@ class ImageHelper {
       BoxFit? fit,
       Widget? placeholder,
       Widget? error}) {
-    Widget placeholderWidget =
-        placeholder ??= const CircularProgressIndicator();
+    ///默认值
+    Widget placeholderWidget = placeholder ??= Stack(
+      alignment: Alignment.center,
+      children: const [
+        SizedBox(height: 30, width: 30, child: CircularProgressIndicator())
+      ],
+    );
+
     Widget errorWidget = error ??= const Icon(Icons.error);
 
-    return CachedNetworkImage(
-      imageUrl: imageUrl,
-      placeholder: (context, url) => placeholderWidget,
-      errorWidget: (context, url, error) => errorWidget,
-      height: height,
-      width: width,
-      fit: fit,
-    );
+    try {
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
+        placeholder: (context, url) => placeholderWidget,
+        errorWidget: (context, url, error) => errorWidget,
+        height: height,
+        width: width,
+        fit: fit,
+      );
+    } catch (e) {
+      return errorWidget;
+    }
   }
 
   /// 加载 assets 图片

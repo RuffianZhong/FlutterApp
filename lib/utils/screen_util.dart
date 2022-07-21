@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:ui' as ui show window;
+
+import 'package:flutter/material.dart';
 
 /// Screen Util.
 class ScreenUtil {
@@ -9,6 +10,7 @@ class ScreenUtil {
   double _statusBarHeight = 0.0;
   double _bottomBarHeight = 0.0;
   double _appBarHeight = 0.0;
+  double _navBarHeight = 0.0;
   MediaQueryData? _mediaQueryData;
 
   static final ScreenUtil _singleton = ScreenUtil();
@@ -28,6 +30,7 @@ class ScreenUtil {
       _statusBarHeight = mediaQuery.padding.top;
       _bottomBarHeight = mediaQuery.padding.bottom;
       _appBarHeight = kToolbarHeight;
+      _navBarHeight = _appBarHeight + _statusBarHeight;
     }
   }
 
@@ -53,6 +56,9 @@ class ScreenUtil {
 
   /// bottom bar Height
   double get bottomBarHeight => _bottomBarHeight;
+
+  /// 导航栏高度: 状态栏高度 + AppBar高度
+  double get navBarHeight => _navBarHeight;
 
   /// media Query Data
   MediaQueryData? get mediaQueryData => _mediaQueryData;

@@ -31,9 +31,9 @@ class HttpResult<T> {
 
     /// 解析成为 List
     if (data is List) {
-      entity.list = convertList(data);
+      entity.list = convertList<T>(data);
     } else {
-      entity.data = convertData(data);
+      entity.data = convertData<T>(data);
     }
 
     entity.code = code;
@@ -42,16 +42,16 @@ class HttpResult<T> {
   }
 
   ///转为List
-  List<T> convertList(dynamic data) {
-    List<T> list = [];
+  static List<M> convertList<M>(dynamic data) {
+    List<M> list = [];
     for (var item in data) {
-      list.add(jsonConvert.convert<T>(item) as T);
+      list.add(jsonConvert.convert<M>(item) as M);
     }
     return list;
   }
 
   ///转为具体数据
-  T? convertData(dynamic data) {
-    return jsonConvert.convert<T>(data);
+  static M? convertData<M>(dynamic data) {
+    return jsonConvert.convert<M>(data);
   }
 }

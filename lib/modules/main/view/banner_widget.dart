@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_wan_android/core/net/cancel/http_canceler.dart';
+import 'package:flutter_wan_android/modules/main/model/banner_entity.dart';
+import 'package:flutter_wan_android/modules/main/model/home_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../helper/image_helper.dart';
 import '../../../res/color_res.dart';
-import '../../../utils/log_util.dart';
 
 ///Banner控件
 class BannerWidget extends StatefulWidget {
@@ -16,16 +18,25 @@ class BannerWidget extends StatefulWidget {
   State<BannerWidget> createState() => _BannerWidgetState();
 }
 
-class _BannerWidgetState extends ZTLifecycleState<BannerWidget> {
+class _BannerWidgetState extends ZTLifecycleState<BannerWidget>
+    with WidgetLifecycleObserver {
+  late BuildContext _buildContext;
+
   @override
   void initState() {
     super.initState();
     getLifecycle().addObserver(BannerViewModel());
+    getLifecycle().addObserver(this);
   }
 
   @override
   Widget build(BuildContext context) {
-    return bannerWidget();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => BannerViewModel())
+      ],
+      child: bannerWidget(),
+    );
   }
 
   Widget bannerWidget() {
@@ -43,6 +54,7 @@ class _BannerWidgetState extends ZTLifecycleState<BannerWidget> {
   ///指示器
   Widget indicator() {
     return Consumer<BannerViewModel>(builder: (context, viewModel, child) {
+      _buildContext = context;
       return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: indicatorChild(viewModel));
@@ -72,24 +84,28 @@ class _BannerWidgetState extends ZTLifecycleState<BannerWidget> {
       return PageView.builder(
         controller: viewModel.controller,
         itemBuilder: (BuildContext context, int index) {
-         // Logger.log("itemBuilder--index:$index");
-
           if (viewModel.dataArray.isNotEmpty) {
-            //Logger.log("---------viewModel.index:${viewModel.index}");
-            return ImageHelper.load(
-                viewModel.dataArray[index % viewModel.dataArray.length],
-                fit: BoxFit.fitWidth);
+            return ImageHelper.network(
+                viewModel
+                    .dataArray[index % viewModel.dataArray.length].imagePath,
+                fit: BoxFit.cover);
           } else {
             return Container();
           }
         },
         onPageChanged: (int index) {
-         // Logger.log("onPageChanged--index:$index");
           viewModel.onPageChanged(index);
         },
         itemCount: viewModel.itemCount,
       );
     });
+  }
+
+  @override
+  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
+    if (state == WidgetLifecycleState.onCreate) {
+      _buildContext.read<BannerViewModel>().getBannerList(owner);
+    }
   }
 }
 
@@ -105,15 +121,26 @@ class BannerViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   final Duration _duration = const Duration(milliseconds: 1500);
 
   ///banner数据列表
-  List _dataArray = [];
+  List<BannerEntity> _dataArray = [];
 
-  List get dataArray => _dataArray;
+  List<BannerEntity> get dataArray => _dataArray;
 
-  set dataArray(List value) {
+  set dataArray(List<BannerEntity> value) {
     _dataArray = value;
     _loopIndex = _resumeMidIndex();
     startLoop();
     notifyListeners();
+  }
+
+  HomeModel model = HomeModel();
+
+  ///获取banner列表
+  void getBannerList(WidgetLifecycleOwner owner) {
+    model.getBannerList(HttpCanceler(owner)).then((value) {
+      if (value.success) {
+        dataArray = value.list!;
+      }
+    });
   }
 
   ///控制器
@@ -127,8 +154,6 @@ class BannerViewModel extends ChangeNotifier with WidgetLifecycleObserver {
     _timer ??= Timer.periodic(_duration, (timer) {
       ///下一页
       controller.nextPage(duration: _duration, curve: Curves.linear);
-      //controller.jumpToPage(_loopIndex++);
-      //_setLoopIndex(_loopIndex++);
     });
   }
 

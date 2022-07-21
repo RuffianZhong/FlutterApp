@@ -1,7 +1,7 @@
 {
   "tab_home": "首页",
   "tab_project": "项目",
-  "tab_wechat": "公众号",
+  "tab_knowledge": "知识",
   "tab_square": "广场",
   "tab_me": "我的",
   "integral": "积分：{value}",
@@ -37,5 +37,8 @@
   "psw_confirm_tip": "两次密码不一致",
   "login_success": "登录成功",
   "register_success": "注册成功",
-  "net_error": "网络错误"
+  "net_error": "网络错误",
+  "tab_tree": "体系",
+  "tab_nav": "导航",
+  "tab_book_course": "书籍教程"
 }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_wan_android/modules/main/model/knowledge_entity.dart';
 import 'package:flutter_wan_android/res/color_res.dart';
 import 'package:provider/provider.dart';
 
 import '../../../generated/l10n.dart';
+import '../view_model/knowledge_view_model.dart';
 
 class MainKnowledgePage extends StatefulWidget {
   const MainKnowledgePage({Key? key}) : super(key: key);
@@ -16,32 +19,27 @@ class _MainKnowledgePageState extends State<MainKnowledgePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Consumer<KnowledgeViewModel>(
-      builder: (context, viewModel, child) {
-        return DefaultTabController(
-            length: viewModel.tabTitleArray(context).length,
-            child: Scaffold(
-              body: bodyContent(viewModel),
-              appBar: AppBar(
-                title: TabBar(
-                  isScrollable: true,
-                  tabs: List.generate(viewModel.tabTitleArray(context).length,
-                      (index) {
-                    return Tab(
-                        child: Text(viewModel.tabTitleArray(context)[index]));
-                  }),
-                ),
-              ),
-            ));
-      },
-    );
+    List<String> titleArray = [S.of(context).tab_tree, S.of(context).tab_nav];
+
+    return DefaultTabController(
+        length: titleArray.length,
+        child: Scaffold(
+          body: bodyContent(titleArray),
+          appBar: AppBar(
+            title: TabBar(
+              isScrollable: true,
+              tabs: List.generate(titleArray.length, (index) {
+                return Tab(child: Text(titleArray[index]));
+              }),
+            ),
+          ),
+        ));
   }
 
-  Widget bodyContent(KnowledgeViewModel viewModel) {
+  Widget bodyContent(List<String> titleArray) {
     return TabBarView(
-        children:
-            List.generate(viewModel.tabTitleArray(context).length, (index) {
-      return KnowledgeItemPage();
+        children: List.generate(titleArray.length, (index) {
+      return KnowledgeItemPage(index == 0 ? system : nav);
     }));
   }
 
@@ -49,72 +47,63 @@ class _MainKnowledgePageState extends State<MainKnowledgePage>
   bool get wantKeepAlive => true;
 }
 
-class KnowledgeViewModel extends ChangeNotifier {
-  ///标题列表
-  List<String> tabTitleArray(BuildContext context) {
-    return [S.of(context).login, S.of(context).register];
-  }
-
-  ///知识体系Map
-  Map<String, List<String>> systemKnowMap = {
-    "基础知识": ["机或轮", "机轮", "机机或机机或轮机或轮或轮轮或轮", "机机或轮机或轮或轮", "或轮或轮", "机或机", "或轮轮"],
-    "知识": ["机或轮", "机轮", "机机或轮或轮", "机机或轮机或轮或轮", "或轮或轮", "机或机", "或轮轮"],
-    "基础知": ["机或机机或轮机或轮或轮轮", "机轮", "机机或轮或轮", "机机或轮机或轮或轮", "或轮或轮", "机或机", "或轮轮"],
-    "基础知识基础知识": [
-      "机或轮",
-      "机轮",
-      "机机机机或轮机或轮或轮或轮或轮",
-      "机机或轮机或轮或轮",
-      "或轮或轮",
-      "机或机",
-      "或轮轮"
-    ],
-  };
-
-  ///知识导航Map
-  Map<String, List<String>> navigationKnowMap = {
-    "基础知识": ["机或轮", "机轮", "机机或机机或轮机或轮或轮轮或轮", "机机或轮机或轮或轮", "或轮或轮", "机或机", "或轮轮"],
-    "知识": ["机或轮", "机轮", "机机或轮或轮", "机机或轮机或轮或轮", "或轮或轮", "机或机", "或轮轮"],
-    "基础知": ["机或机机或轮机或轮或轮轮", "机轮", "机机或轮或轮", "机机或轮机或轮或轮", "或轮或轮", "机或机", "或轮轮"],
-    "基础知识基础知识": [
-      "机或轮",
-      "机轮",
-      "机机机机或轮机或轮或轮或轮或轮",
-      "机机或轮机或轮或轮",
-      "或轮或轮",
-      "机或机",
-      "或轮轮"
-    ],
-  };
-}
+///类别：1：系统，2：导航F
+const system = 1, nav = 2;
 
 class KnowledgeItemPage extends StatefulWidget {
-  const KnowledgeItemPage({Key? key}) : super(key: key);
+  final int type;
+
+  const KnowledgeItemPage(this.type, {Key? key}) : super(key: key);
 
   @override
   State<KnowledgeItemPage> createState() => _KnowledgeItemPageState();
 }
 
-class _KnowledgeItemPageState extends State<KnowledgeItemPage>
-    with AutomaticKeepAliveClientMixin {
+class _KnowledgeItemPageState extends ZTLifecycleState<KnowledgeItemPage>
+    with AutomaticKeepAliveClientMixin, WidgetLifecycleObserver {
+  late BuildContext _buildContext;
+
+  @override
+  void initState() {
+    super.initState();
+    getLifecycle().addObserver(this);
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Consumer<KnowledgeViewModel>(
-      builder: (context, viewModel, child) {
-        return ListView.builder(
-          itemBuilder: (context, index) {
-            String key = viewModel.systemKnowMap.keys.toList()[index];
-            return itemWidget(key, viewModel.systemKnowMap[key]);
-          },
-          itemCount: viewModel.systemKnowMap.length,
-        );
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => KnowledgeViewModel())
+      ],
+      child: Consumer<KnowledgeViewModel>(
+        builder: (context, viewModel, child) {
+          _buildContext = context;
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              return itemWidget(viewModel.entity, index);
+            },
+            itemCount: widget.type == system
+                ? viewModel.entity.categoryList.length
+                : viewModel.entity.navList.length,
+          );
+        },
+      ),
     );
   }
 
-  Widget itemWidget(String title, List<String>? labels) {
+  Widget itemWidget(KnowledgeEntity entity, int itemIndex) {
+    ///标题
+    String title = widget.type == system
+        ? entity.categoryList[itemIndex].name
+        : entity.navList[itemIndex].name;
+
+    ///标签个数
+    int length = widget.type == system
+        ? entity.categoryList[itemIndex].childList!.length
+        : entity.navList[itemIndex].articles.length;
+
     return Container(
       padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
       child: Column(
@@ -129,11 +118,12 @@ class _KnowledgeItemPageState extends State<KnowledgeItemPage>
           Wrap(
             spacing: 6,
             runSpacing: -5,
-            children:
-                List.generate(labels == null ? 0 : labels.length, (index) {
+            children: List.generate(length, (index) {
               return ActionChip(
                   label: Text(
-                    labels![index],
+                    widget.type == system
+                        ? entity.categoryList[itemIndex].childList![index].name
+                        : entity.navList[itemIndex].articles[index].title ?? "",
                     style: const TextStyle(
                         fontSize: 14, color: ColorRes.tContentSub),
                   ),
@@ -147,4 +137,16 @@ class _KnowledgeItemPageState extends State<KnowledgeItemPage>
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
+    if (state == WidgetLifecycleState.onCreate) {
+      KnowledgeViewModel viewModel = _buildContext.read<KnowledgeViewModel>();
+      if (widget.type == nav) {
+        viewModel.getNavList(owner);
+      } else {
+        viewModel.getCategoryList(owner);
+      }
+    }
+  }
 }

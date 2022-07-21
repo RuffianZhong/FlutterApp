@@ -25,10 +25,11 @@ class ArticleEntity {
   String? desc;
 
   ///封面
+  @JSONField(name: "envelopePic")
   String? cover;
 
   ///是否置顶
-  bool? isTop;
+  bool? isTop = false;
 
   ArticleEntity();
 

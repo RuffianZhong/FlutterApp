@@ -20,7 +20,12 @@ class ItemContentWidget extends StatefulWidget {
 class _ItemContentWidgetState extends State<ItemContentWidget> {
   @override
   Widget build(BuildContext context) {
-    return itemWidget(context, widget.article);
+    Color bgColor = Colors.white;
+    if (widget.article.isTop != null && widget.article.isTop == true) {
+      bgColor = const Color(0xFFE3F2FD);
+    }
+    return Container(
+        color: bgColor, child: itemWidget(context, widget.article));
   }
 
   Widget itemWidget(BuildContext context, ArticleEntity article) {
@@ -55,8 +60,8 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
       children: [
         //作者头像
         ClipOval(
-          child:
-              ImageHelper.load(article.userIcon ?? "", height: 45, width: 45),
+          child: ImageHelper.network(article.userIcon ?? "",
+              height: 40, width: 40),
         ),
         const SizedBox(width: 4),
         //作者昵称
@@ -114,7 +119,7 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
         ///条件性展示控件
         Offstage(
             offstage: article.cover?.isEmpty ?? true,
-            child: ImageHelper.load(article.cover ?? "",
+            child: ImageHelper.network(article.cover ?? "",
                 height: 100, width: 70, fit: BoxFit.cover)),
       ],
     );
@@ -137,7 +142,10 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
               ),
             )),
 
-        const SizedBox(width: 6),
+        Offstage(
+          offstage: !(article.isTop ?? false),
+          child: const SizedBox(width: 6),
+        ),
 
         ///标签
         Expanded(
