@@ -21,6 +21,10 @@ class UserEntity {
     if (!json.containsKey("icon")) {
       json["icon"] = ImageHelper.randomUrl();
     }
+    String value = json["icon"];
+    if (value.isEmpty) {
+      json["icon"] = ImageHelper.randomUrl();
+    }
     return $UserEntityFromJson(json);
   }
 

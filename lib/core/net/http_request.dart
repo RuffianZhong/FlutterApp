@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter_wan_android/helper/cookie_helper.dart';
 
 import '../../utils/log_util.dart';
 import '../net/http_config.dart';
@@ -105,6 +107,9 @@ class HttpRequest {
     /// 此处不能无限叠加拦截器
     dio.interceptors.clear();
     dio.interceptors.addAll(inters);
+
+    ///添加cookie
+    dio.interceptors.add(CookieManager(await CookieHelper.cookieJar));
 
     // 3.发送网络请求
     try {

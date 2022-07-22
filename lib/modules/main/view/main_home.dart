@@ -6,12 +6,14 @@ import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/net/cancel/http_canceler.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/main/model/article_entity.dart';
+import 'package:flutter_wan_android/modules/main/model/collect_model.dart';
 import 'package:flutter_wan_android/modules/main/view/item_content_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/lifecycle/zt_lifecycle.dart';
 import '../../../core/net/http_result.dart';
 import '../../../generated/l10n.dart';
+import '../../../utils/log_util.dart';
 import '../../../utils/screen_util.dart';
 import '../view_model/home_view_model.dart';
 import 'banner_widget.dart';
@@ -88,8 +90,8 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
       child: CustomScrollView(
         slivers: [
           const SliverAppBarWidget(),
-          SliverListWidget(viewModel.articleTopList),
-          SliverListWidget(viewModel.articleList),
+          SliverListWidget(viewModel.articleTopList, true),
+          SliverListWidget(viewModel.articleList, false),
         ],
         controller: scrollController,
       ),
@@ -183,7 +185,10 @@ class SliverListWidget extends StatefulWidget {
   ///数据列表
   final List<ArticleEntity> list;
 
-  const SliverListWidget(this.list, {Key? key}) : super(key: key);
+  ///是否置顶的列表
+  final bool isTop;
+
+  const SliverListWidget(this.list, this.isTop, {Key? key}) : super(key: key);
 
   @override
   State<SliverListWidget> createState() => _SliverListWidgetState();
@@ -194,8 +199,37 @@ class _SliverListWidgetState extends State<SliverListWidget> {
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-        return ItemContentWidget(article: widget.list[index]);
+        return ItemContentWidget(
+          article: widget.list[index],
+          onTapCollect: () {
+            actionCollect(index);
+          },
+        );
       }, childCount: widget.list.length),
     );
+  }
+
+  void actionCollect(int index) async {
+    ArticleEntity article = widget.list[index];
+
+    ///当前收藏状态
+    bool collected = article.collect != null && article.collect!;
+
+    HomeViewModel viewModel = context.read<HomeViewModel>();
+
+    CollectModel model = CollectModel();
+    HttpResult result = await (collected
+        ? model.unCollectArticle(article.id)
+        : model.collectArticle(article.id));
+
+    if (result.success) {
+      article.collect = !collected;
+      widget.list[index] = article;
+      if (widget.isTop) {
+        viewModel.articleTopList = widget.list;
+      } else {
+        viewModel.articleList = widget.list;
+      }
+    }
   }
 }

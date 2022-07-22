@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/main/model/article_entity.dart';
 import 'package:flutter_wan_android/utils/string_util.dart';
 
+import '../../../config/router_config.dart';
 import '../../../generated/l10n.dart';
 import '../../../helper/image_helper.dart';
 import '../../../res/color_res.dart';
@@ -11,7 +12,11 @@ import '../../../res/color_res.dart';
 class ItemContentWidget extends StatefulWidget {
   final ArticleEntity article;
 
-  const ItemContentWidget({Key? key, required this.article}) : super(key: key);
+  ///收藏事件回调
+  GestureTapCallback? onTapCollect;
+
+  ItemContentWidget({Key? key, required this.article, this.onTapCollect})
+      : super(key: key);
 
   @override
   State<ItemContentWidget> createState() => _ItemContentWidgetState();
@@ -25,7 +30,16 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
       bgColor = const Color(0xFFE3F2FD);
     }
     return Container(
-        color: bgColor, child: itemWidget(context, widget.article));
+        color: bgColor,
+        child: GestureDetector(
+          onTap: () => actionItemClick(),
+          child: itemWidget(context, widget.article),
+        ));
+  }
+
+  void actionItemClick() {
+    RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
+        arguments: widget.article);
   }
 
   Widget itemWidget(BuildContext context, ArticleEntity article) {
@@ -105,7 +119,7 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
             Offstage(
                 offstage: article.desc?.isEmpty ?? true,
                 child: Text(
-                  article.desc ?? "",
+                  StringUtil.removeHtmlLabel(article.desc ?? ""),
                   style: const TextStyle(
                       fontSize: 15, color: ColorRes.tContentSub),
                   maxLines: 2,
@@ -127,6 +141,10 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
 
   ///底部内容控件
   Widget itemFooterWidget(BuildContext context, ArticleEntity article) {
+    IconData icon = Icons.favorite_border;
+    if (article.collect != null) {
+      icon = article.collect! ? Icons.favorite : Icons.favorite_border;
+    }
     return Row(
       children: [
         ///置顶标识
@@ -157,11 +175,12 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
 
         ///收藏
         GestureDetector(
-            onTap: () {},
-            child: const Icon(
-              Icons.favorite_border,
-              color: Colors.red,
-            )),
+          onTap: widget.onTapCollect,
+          child: Icon(
+            icon,
+            color: Colors.red,
+          ),
+        ),
       ],
     );
   }

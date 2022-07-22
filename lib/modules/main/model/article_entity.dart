@@ -31,6 +31,9 @@ class ArticleEntity {
   ///是否置顶
   bool? isTop = false;
 
+  ///是否收藏
+  bool? collect = false;
+
   ArticleEntity();
 
   factory ArticleEntity.fromJson(Map<String, dynamic> json) {

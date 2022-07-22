@@ -7,7 +7,7 @@ import '../../../core/net/http_request.dart';
 
 class HomeModel {
   ///文章列表
-  final String articleListApi = "article/list/0/json";
+  final String articleListApi = "article/list/%1/json";
 
   ///置顶文章列表
   final String articleTopListApi = "article/top/json";
@@ -19,7 +19,7 @@ class HomeModel {
   Future<HttpResult<ArticleEntity>> getArticleList(
       int pageIndex, HttpCanceler? canceler) async {
     ///参数
-    String api = articleListApi.replaceAll("0", pageIndex.toString());
+    String api = articleListApi.replaceAll("%1", pageIndex.toString());
 
     ///结果
     Map<String, dynamic> json = await HttpRequest.get(api, canceler: canceler);

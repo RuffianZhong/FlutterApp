@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/generated/l10n.dart';
+import 'package:flutter_wan_android/helper/cookie_helper.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
@@ -196,8 +198,12 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
     return Column(
       children: [
         ///收藏
-        _itemWidgetDefault(context, () {}, Icons.favorite_border,
-            S.of(context).collect, Icons.chevron_right),
+        _itemWidgetDefault(
+            context,
+            () => RouterHelper.pushNamed(context, RouterConfig.collectListPage),
+            Icons.favorite_border,
+            S.of(context).collect,
+            Icons.chevron_right),
 
         ///暗黑模式
         _itemWidgetSwitch(
@@ -347,6 +353,8 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
       /// 初始化数据
       MeViewModel viewModel = context.read<MeViewModel>();
       refreshUserData(viewModel);
+    }else if(state==WidgetLifecycleState.onResume){
+      CookieHelper.getCookie();
     }
   }
 }

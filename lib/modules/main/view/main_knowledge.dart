@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_wan_android/helper/router_helper.dart';
+import 'package:flutter_wan_android/modules/main/model/category_entity.dart';
 import 'package:flutter_wan_android/modules/main/model/knowledge_entity.dart';
+import 'package:flutter_wan_android/modules/main/model/nav_entity.dart';
 import 'package:flutter_wan_android/res/color_res.dart';
 import 'package:provider/provider.dart';
 
+import '../../../config/router_config.dart';
 import '../../../generated/l10n.dart';
+import '../model/article_entity.dart';
 import '../view_model/knowledge_view_model.dart';
 
 class MainKnowledgePage extends StatefulWidget {
@@ -127,12 +132,31 @@ class _KnowledgeItemPageState extends ZTLifecycleState<KnowledgeItemPage>
                     style: const TextStyle(
                         fontSize: 14, color: ColorRes.tContentSub),
                   ),
-                  onPressed: () {});
+                  onPressed: () {
+                    if (widget.type == system) {
+                      actionCategoryChild(
+                          entity.categoryList[itemIndex], index);
+                    } else {
+                      actionArticleDetails(
+                          entity.navList[itemIndex].articles[index]);
+                    }
+                  });
             }),
           )
         ],
       ),
     );
+  }
+
+  void actionCategoryChild(CategoryEntity category, int index) {
+    Map<String, dynamic> arguments = {"entity": category.toString(), "index": index};
+    RouterHelper.pushNamed(context, RouterConfig.knowledgeChildPage,
+        arguments: arguments);
+  }
+
+  void actionArticleDetails(ArticleEntity article) {
+    RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
+        arguments: article);
   }
 
   @override
