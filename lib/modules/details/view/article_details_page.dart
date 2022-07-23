@@ -20,6 +20,12 @@ class ArticleDetailsPage extends StatefulWidget {
 
 class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
     with WidgetLifecycleObserver {
+  ///滚动进度
+  double scrollProgress = 0.0;
+
+  ///页面可滚动内容高度
+  double scrollHeight = 0.0;
+  final GlobalKey _globalKeyWebView = GlobalKey();
   late BuildContext _buildContext;
 
   late InAppWebViewController _webViewController;
@@ -51,6 +57,11 @@ class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
   ///收藏
   void actionCollect(BuildContext context, ArticleDetailsViewModel viewModel) {}
 
+  ///返回
+  void actionBack(BuildContext context) {
+    RouterHelper.pop(context, scrollProgress);
+  }
+
   ///导航栏
   AppBar appBar(BuildContext context, ArticleDetailsViewModel viewModel) {
     return AppBar(
@@ -58,7 +69,7 @@ class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
 
       ///返回按钮
       leading: GestureDetector(
-          onTap: () => RouterHelper.pop(context),
+          onTap: () => actionBack(context),
           child: const Icon(Icons.arrow_back)),
 
       ///标题
@@ -113,6 +124,7 @@ class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
   ///WebView
   Widget webContent(BuildContext context, ArticleDetailsViewModel viewModel) {
     return InAppWebView(
+      key: _globalKeyWebView,
       initialOptions: options,
       /*initialUrlRequest:
           URLRequest(url: Uri.parse(viewModel.articleEntity?.link ?? "")),*/
@@ -127,6 +139,20 @@ class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
         if (url.isNotEmpty) {
           _webViewController.loadUrl(
               urlRequest: URLRequest(url: Uri.parse(url)));
+        }
+      },
+
+      onLoadStop: (InAppWebViewController controller, Uri? url) async {
+        int contentHeight = await controller.getContentHeight() ?? 0;
+        double widgetHeight =
+            _globalKeyWebView.currentContext?.size?.height ?? 0;
+        scrollHeight = contentHeight - widgetHeight;
+      },
+
+      ///滚动监听
+      onScrollChanged: (InAppWebViewController controller, int x, int y) {
+        if (scrollHeight > 0) {
+          scrollProgress = y / scrollHeight;
         }
       },
     );

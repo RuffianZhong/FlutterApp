@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
+import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../../generated/l10n.dart';
@@ -34,6 +36,11 @@ class _MainSquarePageState extends ZTLifecycleState<MainSquarePage>
         body: bodyContent());
   }
 
+  void actionItemClick(BookEntity book) {
+    RouterHelper.pushNamed(context, RouterConfig.bookDetailsPage,
+        arguments: book);
+  }
+
   Widget bodyContent() {
     return Consumer<SquareViewModel>(builder: (context, viewModel, child) {
       _buildContext = context;
@@ -51,10 +58,13 @@ class _MainSquarePageState extends ZTLifecycleState<MainSquarePage>
     });
   }
 
-  Widget itemWidget(BookEntity entity) {
-    return ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: ImageHelper.network(entity.cover, fit: BoxFit.cover));
+  Widget itemWidget(BookEntity book) {
+    return GestureDetector(
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: ImageHelper.network(book.cover, fit: BoxFit.cover)),
+      onTap: () => actionItemClick(book),
+    );
   }
 
   @override

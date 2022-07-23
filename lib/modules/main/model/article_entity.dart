@@ -1,10 +1,11 @@
-import 'package:flutter_wan_android/generated/json/base/json_field.dart';
-import 'package:flutter_wan_android/generated/json/article_entity.g.dart';
 import 'dart:convert';
 
+import 'package:flutter_wan_android/generated/json/article_entity.g.dart';
+import 'package:flutter_wan_android/generated/json/base/json_field.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 
 import '../../../generated/json/base/json_convert_content.dart';
+import '../../book/model/study_entity.dart';
 
 @JsonSerializable()
 class ArticleEntity {
@@ -22,6 +23,11 @@ class ArticleEntity {
 
   ///副级分类
   String? chapterName;
+
+  ///文章可能是在多级，此字段是文章所属的直系分类ID
+  int? chapterId;
+
+  ///简介，副标题
   String? desc;
 
   ///封面
@@ -33,6 +39,10 @@ class ArticleEntity {
 
   ///是否收藏
   bool? collect = false;
+
+  ///学习进度：不参与自动解析
+  @JSONField(name: "", deserialize: false, serialize: false)
+  StudyEntity? study;
 
   ArticleEntity();
 

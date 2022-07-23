@@ -1,5 +1,7 @@
+import 'package:flutter_wan_android/modules/book/model/study_dao.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../utils/log_util.dart';
 import 'dao/search_dao.dart';
 
 ///数据库辅助类
@@ -10,7 +12,7 @@ class SqliteHelper {
   final String path = "zt_com_flutter.db";
 
   ///数据库版本
-  final int version = 1;
+  final int version = 2;
 
   ///打开数据库
   Future<Database?> open() async {
@@ -22,7 +24,12 @@ class SqliteHelper {
     },
 
         ///数据库升级
-        onUpgrade: (Database db, int oldVersion, int newVersion) {});
+        onUpgrade: (Database db, int oldVersion, int newVersion) {
+      Logger.log("----------update$newVersion");
+      if (newVersion == 2) {
+        StudyDao.createTable(db);
+      }
+    });
 
     return _database;
   }

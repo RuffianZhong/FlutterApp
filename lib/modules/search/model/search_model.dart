@@ -6,7 +6,6 @@ import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
 
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../core/net/http_result.dart';
-import '../../main/model/article_rsp_entity.dart';
 
 ///SearchModel
 class SearchModel {

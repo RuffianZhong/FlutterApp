@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/modules/book/view/book_details_page.dart';
 import 'package:flutter_wan_android/modules/details/view/article_details_page.dart';
 import 'package:flutter_wan_android/modules/main/view/collection_list_page.dart';
 import 'package:flutter_wan_android/modules/main/view/knowledge_child_page.dart';
@@ -27,6 +28,9 @@ class RouterConfig {
   ///收藏列表页面
   static const String collectListPage = "collectListPage";
 
+  ///教程详情页面
+  static const String bookDetailsPage = "bookDetailsPage";
+
   ///路由表配置
   static Map<String, WidgetBuilder> routes = {
     searchPage: (context) => const SearchPage(),
@@ -35,5 +39,6 @@ class RouterConfig {
     registerPage: (context) => const RegisterPage(),
     knowledgeChildPage: (context) => const KnowledgeChildPage(),
     collectListPage: (context) => const CollectionListPage(),
+    bookDetailsPage: (context) => const BookDetailsPage(),
   };
 }
