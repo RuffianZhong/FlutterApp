@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/modules/main/view/main_home.dart';
+import 'package:flutter_wan_android/modules/main/view_model/locale_view_model.dart';
 import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
-import 'package:flutter_wan_android/res/color_res.dart';
+import 'package:flutter_wan_android/modules/main/view_model/theme_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'config/router_config.dart';
@@ -27,34 +28,42 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      /// widget本地化代理设置
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        S.delegate //自定义国际化
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => LocaleViewModel()),
+        ChangeNotifierProvider(create: (context) => ThemeViewModel())
       ],
+      child: Consumer2<ThemeViewModel, LocaleViewModel>(
+        builder: (context, themeModel, localModel, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
 
-      /// widget本地化支持语言
-      supportedLocales: S.delegate.supportedLocales,
+            /// widget本地化代理设置
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              S.delegate //自定义国际化
+            ],
 
-      /// 生命周期感知
-      navigatorObservers: [WidgetRouteObserver.routeObserver],
+            ///指定语言
+            locale: localModel.locale,
 
-      ///路由表配置
-      routes: RouterConfig.routes,
+            /// widget本地化支持语言
+            supportedLocales: S.delegate.supportedLocales,
 
-      title: 'WanAndroid',
-      theme: ThemeData(
-        primarySwatch: ColorRes.theme,
+            /// 生命周期感知
+            navigatorObservers: [WidgetRouteObserver.routeObserver],
+
+            ///路由表配置
+            routes: RouterConfig.routes,
+
+            title: 'WanAndroid',
+            theme: themeModel.themeData,
+            home: const MyHomePage(title: 'Flutter Demo Home Page'),
+          );
+        },
       ),
-      //home: BookDetailsPage(),
-      //home: SearchPage(),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      // home: const (),
-      // home: const RegisterPage(),
-      //home: LoginPage(),
     );
   }
 }
@@ -141,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
             S.of(context).tab_knowledge, "ic_tab_wechat.png"),
         _bottomNavigationBarItem(S.of(context).tab_me, "ic_tab_me.png"),
       ],
-      selectedItemColor: ColorRes.themeMain,
+      // selectedItemColor:Theme.of(context).primaryColor,
       currentIndex: _navBarIndex,
       backgroundColor: Colors.white,
       type: BottomNavigationBarType.fixed,
@@ -161,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
       icon: Image.asset(ImageHelper.wrapAssets(icon),
           height: 24, width: 24, color: Colors.grey),
       activeIcon: Image.asset(ImageHelper.wrapAssets(icon),
-          height: 24, width: 24, color: ColorRes.themeMain),
+          height: 24, width: 24, color: Theme.of(context).primaryColor),
       label: label,
     );
   }

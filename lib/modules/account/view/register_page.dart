@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_wan_android/common/global_value.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
-import 'package:flutter_wan_android/utils/log_util.dart';
 import 'package:flutter_wan_android/utils/toast_util.dart';
 import 'package:flutter_wan_android/widget/loading_dialog_helper.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +9,6 @@ import 'package:provider/provider.dart';
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../generated/l10n.dart';
 import '../../../helper/router_helper.dart';
-import '../../../res/color_res.dart';
 import '../../../utils/screen_util.dart';
 import '../view_model/register_view_model.dart';
 
@@ -79,7 +76,6 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
     }
 
     LoadingDialogHelper.showLoading(context);
-
 
     ///注册
     viewModel.model
@@ -157,7 +153,7 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
     return Container(
       alignment: Alignment.center,
       height: 300,
-      color: ColorRes.themeMain,
+      color: Theme.of(context).primaryColor,
       child: Image.asset(ImageHelper.wrapAssets("ic_logo.png"),
           width: 150, color: Colors.white),
     );
@@ -176,7 +172,8 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
           borderRadius: BorderRadius.circular(2),
           boxShadow: [
             BoxShadow(
-                color: ColorRes.themeMain.withOpacity(0.3), blurRadius: 10.0)
+                color: Theme.of(context).primaryColor.withOpacity(0.3),
+                blurRadius: 10.0)
           ]),
       child: Column(
         children: [
@@ -251,7 +248,7 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
           }
 
           //默认状态
-          return ColorRes.themeMain;
+          return Theme.of(context).primaryColor;
         }),
 
         ///前景：字体
@@ -298,7 +295,7 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
           prefixIcon: Icon(
             prefixIcon,
             size: 28,
-            color: ColorRes.themeMain,
+            color: Theme.of(context).primaryColor,
           ),
           //后缀图标
           suffix: IconButton(
@@ -309,10 +306,10 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
           enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.grey[300]!)),
           //获取焦点边框装饰
-          focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: ColorRes.themeMain)),
+          focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).primaryColor)),
         ),
-        cursorColor: ColorRes.themeMain,
+        cursorColor: Theme.of(context).primaryColor,
         //密码模式
         obscureText: obscureText,
         //键盘完成按钮样式

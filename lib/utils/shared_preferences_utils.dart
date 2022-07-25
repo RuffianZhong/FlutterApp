@@ -2,15 +2,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// shared_preferences 工具类
 /// 封装一层，方面后续维护
-class SPUtils {
+class SpUtil {
   /// 静态变量指向自身
-  static final SPUtils _instance = SPUtils._();
+  static final SpUtil _instance = SpUtil._();
 
   /// 私有构造器
-  SPUtils._();
+  SpUtil._();
 
   /// 方案1：静态方法获得实例变量
-  static SPUtils getInstance() => _instance;
+  static SpUtil getInstance() => _instance;
 
   /// 方案2：工厂构造方法获得实例变量(不能异步)
 //factory SPUtils() => _instance;

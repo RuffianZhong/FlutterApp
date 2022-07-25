@@ -5,12 +5,12 @@ import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/book/model/book_entity.dart';
 import 'package:flutter_wan_android/res/color_res.dart';
+import 'package:flutter_wan_android/utils/format_util.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../core/net/http_result.dart';
 import '../../../generated/l10n.dart';
-import '../../../utils/log_util.dart';
 import '../../../utils/screen_util.dart';
 import '../../main/model/article_entity.dart';
 import '../model/book_model.dart';
@@ -327,8 +327,6 @@ class _SliverListWidgetState extends State<SliverListWidget> {
     RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
             arguments: article)
         .then((value) {
-      Logger.log("back--------$value");
-
       ///页面返回逻辑
       if (value != null && value is double) {
         ///更新学习进度
@@ -345,8 +343,10 @@ class _SliverListWidgetState extends State<SliverListWidget> {
     });
   }
 
+  ///章节列表
   Widget itemWidget(ArticleEntity article, int index) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => actionItemClick(article, index),
       child: Container(
         padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
@@ -371,14 +371,17 @@ class _SliverListWidgetState extends State<SliverListWidget> {
             Offstage(
                 offstage: article.study == null,
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ///进度文本
                     Text(
                         S.of(context).learn_progress(article.study == null
                             ? 0
-                            : article.study!.progress.toInt() * 100),
-                        style: const TextStyle(
-                            fontSize: 14, color: ColorRes.themeMain)),
+                            : FormatUtil.formatNumber(
+                                "##", article.study!.progress * 100)),
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).primaryColor)),
 
                     const SizedBox(width: 4),
 
@@ -386,7 +389,7 @@ class _SliverListWidgetState extends State<SliverListWidget> {
                     Expanded(
                         child: LinearProgressIndicator(
                       value: article.study?.progress,
-                      color: ColorRes.themeMain,
+                      color: Theme.of(context).primaryColor,
                       backgroundColor: Colors.grey[300],
                     )),
 
@@ -396,11 +399,11 @@ class _SliverListWidgetState extends State<SliverListWidget> {
                     Text(
                         article.study == null
                             ? ""
-                            : DateTime.fromMillisecondsSinceEpoch(
-                                    article.study!.time)
+                            : FormatUtil.formatMilliseconds(
+                                    FormatUtil.ymdHms, article.study!.time)
                                 .toString(),
                         style: const TextStyle(
-                            fontSize: 14, color: ColorRes.tContentSub)),
+                            fontSize: 12, color: ColorRes.tContentSub)),
                   ],
                 )),
 
@@ -414,6 +417,5 @@ class _SliverListWidgetState extends State<SliverListWidget> {
         ),
       ),
     );
-    ;
   }
 }

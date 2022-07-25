@@ -152,11 +152,12 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
             offstage: !(article.isTop ?? false),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 2),
-              decoration:
-                  BoxDecoration(border: Border.all(color: ColorRes.themeMain)),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).primaryColor)),
               child: Text(
                 S.of(context).topping,
-                style: const TextStyle(fontSize: 12, color: ColorRes.themeMain),
+                style: TextStyle(
+                    fontSize: 12, color: Theme.of(context).primaryColor),
               ),
             )),
 
@@ -178,7 +179,7 @@ class _ItemContentWidgetState extends State<ItemContentWidget> {
           onTap: widget.onTapCollect,
           child: Icon(
             icon,
-            color: Colors.red,
+            color: Theme.of(context).primaryColor,
           ),
         ),
       ],

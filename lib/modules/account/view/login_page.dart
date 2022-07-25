@@ -1,13 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
-import 'package:flutter_wan_android/core/net/http_result.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
-import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 import 'package:flutter_wan_android/modules/account/view_model/login_view_model.dart';
 import 'package:flutter_wan_android/utils/screen_util.dart';
 import 'package:flutter_wan_android/utils/toast_util.dart';
@@ -15,7 +11,6 @@ import 'package:provider/provider.dart';
 
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../generated/l10n.dart';
-import '../../../res/color_res.dart';
 import '../../../utils/log_util.dart';
 import '../../../widget/loading_dialog_helper.dart';
 
@@ -164,7 +159,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
     return Container(
       alignment: Alignment.center,
       height: 300,
-      color: ColorRes.themeMain,
+      color: Theme.of(context).primaryColor,
       child: ImageHelper.assets("ic_logo.png", width: 150, color: Colors.white),
     );
   }
@@ -190,7 +185,8 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
           borderRadius: BorderRadius.circular(2),
           boxShadow: [
             BoxShadow(
-                color: ColorRes.themeMain.withOpacity(0.3), blurRadius: 10.0)
+                color: Theme.of(context).primaryColor.withOpacity(0.3),
+                blurRadius: 10.0)
           ]),
       child: Column(
         children: [
@@ -247,7 +243,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
           }
 
           //默认状态
-          return ColorRes.themeMain;
+          return Theme.of(context).primaryColor;
         }),
 
         ///前景：字体
@@ -294,7 +290,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
           prefixIcon: Icon(
             prefixIcon,
             size: 28,
-            color: ColorRes.themeMain,
+            color: Theme.of(context).primaryColor,
           ),
           //后缀图标
           suffix: IconButton(
@@ -305,10 +301,10 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
           enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.grey[300]!)),
           //获取焦点边框装饰
-          focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: ColorRes.themeMain)),
+          focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).primaryColor)),
         ),
-        cursorColor: ColorRes.themeMain,
+        cursorColor: Theme.of(context).primaryColor,
         //密码模式
         obscureText: obscureText,
         //键盘完成按钮样式
@@ -333,7 +329,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
               style: const TextStyle(color: Colors.black)),
           TextSpan(
               text: S.of(context).register_now,
-              style: const TextStyle(color: ColorRes.themeMain))
+              style: TextStyle(color: Theme.of(context).primaryColor))
         ])),
       ),
     );

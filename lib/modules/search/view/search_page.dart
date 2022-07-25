@@ -124,7 +124,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
       title: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-            color: ColorRes.theme[900]?.withOpacity(0.3),
+            color: Colors.white.withOpacity(0.3),
             borderRadius: BorderRadius.circular(50)),
         child: TextFormField(
           controller: editingController,
@@ -136,7 +136,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
             border: InputBorder.none,
             hintText: S.of(context).search_hint,
             hintStyle:
-                const TextStyle(fontSize: 15, color: ColorRes.tContentSub),
+                TextStyle(fontSize: 15, color: Colors.white.withOpacity(0.3)),
             //后缀图标
             suffix: GestureDetector(
                 onTap: () {
@@ -167,7 +167,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
 
     return EasyRefresh(
       controller: controller,
-      footer:ClassicFooter() ,
+      footer: ClassicFooter(),
       onRefresh: () async {
         await Future.delayed(Duration(seconds: 2), () {
           //controller.callRefresh();
@@ -182,6 +182,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
           return IndicatorResult.noMore;
         });
       },
+
       ///return IndicatorResult.success;
       child: ListView.builder(
         itemBuilder: (context, index) {
@@ -244,8 +245,9 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
                 ///固定标题
                 Expanded(
                     child: Text(title,
-                        style: const TextStyle(
-                            fontSize: 16, color: ColorRes.themeMain))),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).primaryColor))),
 
                 ///清除全部数据
                 Offstage(

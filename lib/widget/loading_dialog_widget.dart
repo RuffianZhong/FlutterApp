@@ -24,7 +24,7 @@ class LoadingDialogWidget extends StatelessWidget {
               height: 80,
               width: 80,
               child: CircularProgressIndicator(
-                color: ColorRes.themeMain,
+                color: Theme.of(context).primaryColor,
                 backgroundColor: Colors.grey[300],
               ),
             ),

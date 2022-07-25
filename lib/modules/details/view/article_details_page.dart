@@ -8,7 +8,6 @@ import 'package:flutter_wan_android/utils/string_util.dart';
 import 'package:provider/provider.dart';
 
 import '../../../generated/l10n.dart';
-import '../../../res/color_res.dart';
 
 ///文章详情页面
 class ArticleDetailsPage extends StatefulWidget {
@@ -166,13 +165,13 @@ class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
       children: [
         CircularProgressIndicator(
           value: viewModel.loadProgress,
-          color: ColorRes.themeMain,
+          color: Theme.of(context).primaryColor,
           backgroundColor: Colors.grey[300],
         ),
         const SizedBox(height: 20, width: double.infinity),
         Text(
           S.of(context).loading_content,
-          style: const TextStyle(fontSize: 16, color: ColorRes.themeMain),
+          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
         )
       ],
     );

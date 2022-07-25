@@ -9,6 +9,7 @@ import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 import 'package:flutter_wan_android/modules/account/view/login_page.dart';
 import 'package:flutter_wan_android/modules/main/view/preview_page.dart';
+import 'package:flutter_wan_android/modules/main/view_model/locale_view_model.dart';
 import 'package:flutter_wan_android/modules/main/view_model/me_view_model.dart';
 import 'package:flutter_wan_android/utils/screen_util.dart';
 import 'package:flutter_wan_android/utils/toast_util.dart';
@@ -19,6 +20,7 @@ import '../../../config/hero_config.dart';
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../res/color_res.dart';
 import '../../../utils/log_util.dart';
+import '../view_model/theme_view_model.dart';
 
 class MainMePage extends StatefulWidget {
   const MainMePage({Key? key}) : super(key: key);
@@ -106,7 +108,7 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
         ScreenUtil.get().appBarHeight + ScreenUtil.get().statusBarHeight;
 
     return Container(
-      color: ColorRes.themeMain,
+      color: Theme.of(context).primaryColor,
       width: double.infinity,
       child: Consumer<MeViewModel>(
         builder: (context, viewModel, child) {
@@ -206,22 +208,25 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
             Icons.chevron_right),
 
         ///暗黑模式
-        _itemWidgetSwitch(
-            context,
-            (value) {},
-            Theme.of(context).brightness == Brightness.light
-                ? Icons.brightness_5
-                : Icons.brightness_2,
-            S.of(context).dark_style,
-            Theme.of(context).brightness == Brightness.dark),
+        _itemWidgetSwitch(context, (value) {
+          viewModel.darkMode = value;
+        }, viewModel.darkMode ? Icons.brightness_2 : Icons.brightness_5,
+            S.of(context).dark_style, viewModel.darkMode),
 
         ///彩色主题
         _itemWidgetExpansion(S.of(context).color_theme, Icons.color_lens,
-            _itemChildTheme(() {})),
+            _itemChildTheme(viewModel)),
 
         ///多语言
-        _itemWidgetExpansion(S.of(context).multi_language, Icons.language,
-            _itemChildLanguage((value) {})),
+        _itemWidgetExpansion(
+            S.of(context).multi_language,
+            Icons.language,
+            _itemChildLanguage(viewModel, onChanged: (value) {
+              if (value != null) {
+                viewModel.localIndexValue = value;
+                context.read<LocaleViewModel>().setLocalIndex(value);
+              }
+            })),
 
         ///设置
         /*_itemWidgetDefault(context, () {}, Icons.settings,
@@ -291,7 +296,7 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
   }
 
   ///彩色主题
-  Widget _itemChildTheme(GestureTapCallback onTap) {
+  Widget _itemChildTheme(MeViewModel viewModel) {
     ///流式布局
     return Wrap(
       spacing: 5,
@@ -299,12 +304,23 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
       children: [
         /// ... 适配类型？？
         ...Colors.primaries.map((color) {
+          int index = Colors.primaries.indexOf(color);
+
           ///指定形状
           return Material(
             color: color,
             child: InkWell(
-              onTap: onTap,
-              child: const SizedBox(height: 40, width: 40),
+              onTap: () {
+                viewModel.themeIndex = index;
+                context.read<ThemeViewModel>().setThemeIndex(index);
+              },
+              child: SizedBox(
+                height: 40,
+                width: 40,
+                child: viewModel.themeIndex == index
+                    ? const Icon(Icons.check)
+                    : null,
+              ),
             ),
           );
         }).toList()
@@ -312,16 +328,18 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
     );
   }
 
-  int groupValue = 0;
-
   ///多语言
-  Widget _itemChildLanguage(ValueChanged<int?>? onChanged) {
+  Widget _itemChildLanguage(MeViewModel viewModel,
+      {required ValueChanged<int?> onChanged}) {
     return Column(
       children: [
         ///中文
         Row(
           children: [
-            Radio(value: 0, groupValue: groupValue, onChanged: onChanged),
+            Radio(
+                value: 0,
+                groupValue: viewModel.localIndexValue,
+                onChanged: onChanged),
             Text(
               S.of(context).language_chinese,
               style: const TextStyle(fontSize: 14),
@@ -332,7 +350,10 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
         ///英文
         Row(
           children: [
-            Radio(value: 1, groupValue: groupValue, onChanged: onChanged),
+            Radio(
+                value: 1,
+                groupValue: viewModel.localIndexValue,
+                onChanged: onChanged),
             Text(
               S.of(context).language_english,
               style: const TextStyle(fontSize: 14),
@@ -352,8 +373,10 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
       /// 首帧绘制完成
       /// 初始化数据
       MeViewModel viewModel = context.read<MeViewModel>();
-      refreshUserData(viewModel);
-    }else if(state==WidgetLifecycleState.onResume){
+      viewModel.initLocalData(context);
+      viewModel.initThemeData(context);
+      viewModel.initUserData();
+    } else if (state == WidgetLifecycleState.onResume) {
       CookieHelper.getCookie();
     }
   }

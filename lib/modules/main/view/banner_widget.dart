@@ -8,7 +8,6 @@ import 'package:flutter_wan_android/modules/main/model/home_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../helper/image_helper.dart';
-import '../../../res/color_res.dart';
 
 ///Banner控件
 class BannerWidget extends StatefulWidget {
@@ -71,7 +70,9 @@ class _BannerWidgetState extends ZTLifecycleState<BannerWidget>
         child: Icon(
           Icons.circle,
           size: 10,
-          color: viewModel.index == i ? ColorRes.themeMain : Colors.grey,
+          color: viewModel.index == i
+              ? Theme.of(context).primaryColor
+              : Colors.grey,
         ),
       ));
     }
