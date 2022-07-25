@@ -56,6 +56,8 @@ dependencies:
   #网络请求cookie
   cookie_jar: ^3.0.1
   dio_cookie_manager: ^2.0.0
+  #国际化
+  intl: ^0.17.0
 
 # 开发依赖
 dev_dependencies:
