@@ -50,100 +50,100 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  /// `首页`
+  /// `Home`
   String get tab_home {
     return Intl.message(
-      '首页',
+      'Home',
       name: 'tab_home',
       desc: '',
       args: [],
     );
   }
 
-  /// `项目`
+  /// `Project`
   String get tab_project {
     return Intl.message(
-      '项目',
+      'Project',
       name: 'tab_project',
       desc: '',
       args: [],
     );
   }
 
-  /// `公众号`
-  String get tab_wechat {
+  /// `Knowledge`
+  String get tab_knowledge {
     return Intl.message(
-      '公众号',
-      name: 'tab_wechat',
+      'Knowledge',
+      name: 'tab_knowledge',
       desc: '',
       args: [],
     );
   }
 
-  /// `广场`
-  String get tab_square {
+  /// `Book`
+  String get tab_book {
     return Intl.message(
-      '广场',
-      name: 'tab_square',
+      'Book',
+      name: 'tab_book',
       desc: '',
       args: [],
     );
   }
 
-  /// `我的`
+  /// `Me`
   String get tab_me {
     return Intl.message(
-      '我的',
+      'Me',
       name: 'tab_me',
       desc: '',
       args: [],
     );
   }
 
-  /// `积分：{value}`
+  /// `Integral：{value}`
   String integral(Object value) {
     return Intl.message(
-      '积分：$value',
+      'Integral：$value',
       name: 'integral',
       desc: '',
       args: [value],
     );
   }
 
-  /// `收藏`
+  /// `Collect`
   String get collect {
     return Intl.message(
-      '收藏',
+      'Collect',
       name: 'collect',
       desc: '',
       args: [],
     );
   }
 
-  /// `暗黑模式`
+  /// `Dark Mode`
   String get dark_style {
     return Intl.message(
-      '暗黑模式',
+      'Dark Mode',
       name: 'dark_style',
       desc: '',
       args: [],
     );
   }
 
-  /// `彩色主题`
+  /// `Color Theme`
   String get color_theme {
     return Intl.message(
-      '彩色主题',
+      'Color Theme',
       name: 'color_theme',
       desc: '',
       args: [],
     );
   }
 
-  /// `设置`
+  /// `Settings`
   String get settings {
     return Intl.message(
-      '设置',
+      'Settings',
       name: 'settings',
       desc: '',
       args: [],
@@ -160,80 +160,80 @@ class S {
     );
   }
 
-  /// `登录`
+  /// `Login`
   String get login {
     return Intl.message(
-      '登录',
+      'Login',
       name: 'login',
       desc: '',
       args: [],
     );
   }
 
-  /// `注册`
+  /// `Register`
   String get register {
     return Intl.message(
-      '注册',
+      'Register',
       name: 'register',
       desc: '',
       args: [],
     );
   }
 
-  /// `立即注册`
+  /// `Register now`
   String get register_now {
     return Intl.message(
-      '立即注册',
+      'Register now',
       name: 'register_now',
       desc: '',
       args: [],
     );
   }
 
-  /// `还没账号？`
+  /// `No account yet？`
   String get no_account {
     return Intl.message(
-      '还没账号？',
+      'No account yet？',
       name: 'no_account',
       desc: '',
       args: [],
     );
   }
 
-  /// `用户名`
+  /// `UserName`
   String get user_name {
     return Intl.message(
-      '用户名',
+      'UserName',
       name: 'user_name',
       desc: '',
       args: [],
     );
   }
 
-  /// `密码`
+  /// `Password`
   String get user_psw {
     return Intl.message(
-      '密码',
+      'Password',
       name: 'user_psw',
       desc: '',
       args: [],
     );
   }
 
-  /// `确认密码`
+  /// `Confirm Password`
   String get user_psw_confirm {
     return Intl.message(
-      '确认密码',
+      'Confirm Password',
       name: 'user_psw_confirm',
       desc: '',
       args: [],
     );
   }
 
-  /// `置顶`
+  /// `Topping`
   String get topping {
     return Intl.message(
-      '置顶',
+      'Topping',
       name: 'topping',
       desc: '',
       args: [],
@@ -250,191 +250,221 @@ class S {
     );
   }
 
-  /// `用空格分隔多个关键词`
+  /// `separate multiple keywords with spaces`
   String get search_hint {
     return Intl.message(
-      '用空格分隔多个关键词',
+      'separate multiple keywords with spaces',
       name: 'search_hint',
       desc: '',
       args: [],
     );
   }
 
-  /// `热门搜索`
+  /// `Popular search`
   String get search_hot_title {
     return Intl.message(
-      '热门搜索',
+      'Popular search',
       name: 'search_hot_title',
       desc: '',
       args: [],
     );
   }
 
-  /// `历史搜索`
+  /// `Historical search`
   String get search_local_title {
     return Intl.message(
-      '历史搜索',
+      'Historical search',
       name: 'search_local_title',
       desc: '',
       args: [],
     );
   }
 
-  /// `编辑`
+  /// `Edit`
   String get edit {
     return Intl.message(
-      '编辑',
+      'Edit',
       name: 'edit',
       desc: '',
       args: [],
     );
   }
 
-  /// `清除全部`
+  /// `Clear all`
   String get clean_all {
     return Intl.message(
-      '清除全部',
+      'Clear all',
       name: 'clean_all',
       desc: '',
       args: [],
     );
   }
 
-  /// `完成`
+  /// `Done`
   String get done {
     return Intl.message(
-      '完成',
+      'Done',
       name: 'done',
       desc: '',
       args: [],
     );
   }
 
-  /// `内容加载中...`
+  /// `content loading...`
   String get loading_content {
     return Intl.message(
-      '内容加载中...',
+      'content loading...',
       name: 'loading_content',
       desc: '',
       args: [],
     );
   }
 
-  /// `已学{progress}%`
+  /// `Learned{progress}%`
   String learn_progress(Object progress) {
     return Intl.message(
-      '已学$progress%',
+      'Learned$progress%',
       name: 'learn_progress',
       desc: '',
       args: [progress],
     );
   }
 
-  /// `未学习`
+  /// `No learned`
   String get learn_no {
     return Intl.message(
-      '未学习',
+      'No learned',
       name: 'learn_no',
       desc: '',
       args: [],
     );
   }
 
-  /// `多语言`
+  /// `Multi language`
   String get multi_language {
     return Intl.message(
-      '多语言',
+      'Multi language',
       name: 'multi_language',
       desc: '',
       args: [],
     );
   }
 
-  /// `中文`
+  /// `Chinese`
   String get language_chinese {
     return Intl.message(
-      '中文',
+      'Chinese',
       name: 'language_chinese',
       desc: '',
       args: [],
     );
   }
 
-  /// `英文`
+  /// `English`
   String get language_english {
     return Intl.message(
-      '英文',
+      'English',
       name: 'language_english',
       desc: '',
       args: [],
     );
   }
 
-  /// `请输入账号`
+  /// `Please enter an account`
   String get account_empty_tip {
     return Intl.message(
-      '请输入账号',
+      'Please enter an account',
       name: 'account_empty_tip',
       desc: '',
       args: [],
     );
   }
 
-  /// `请输入密码`
+  /// `Please enter an password`
   String get psw_empty_tip {
     return Intl.message(
-      '请输入密码',
+      'Please enter an password',
       name: 'psw_empty_tip',
       desc: '',
       args: [],
     );
   }
 
-  /// `请确认密码`
+  /// `Please confirm the password`
   String get psw_confirm_empty_tip {
     return Intl.message(
-      '请确认密码',
+      'Please confirm the password',
       name: 'psw_confirm_empty_tip',
       desc: '',
       args: [],
     );
   }
 
-  /// `两次密码不一致`
+  /// `Two passwords are inconsistent`
   String get psw_confirm_tip {
     return Intl.message(
-      '两次密码不一致',
+      'Two passwords are inconsistent',
       name: 'psw_confirm_tip',
       desc: '',
       args: [],
     );
   }
 
-  /// `登录成功`
+  /// `Login success`
   String get login_success {
     return Intl.message(
-      '登录成功',
+      'Login success',
       name: 'login_success',
       desc: '',
       args: [],
     );
   }
 
-  /// `注册成功`
+  /// `Register success`
   String get register_success {
     return Intl.message(
-      '注册成功',
+      'Register success',
       name: 'register_success',
       desc: '',
       args: [],
     );
   }
 
-  /// `网络错误`
+  /// `Network error`
   String get net_error {
     return Intl.message(
-      '网络错误',
+      'Network error',
       name: 'net_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `System`
+  String get tab_tree {
+    return Intl.message(
+      'System',
+      name: 'tab_tree',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Navigation`
+  String get tab_nav {
+    return Intl.message(
+      'Navigation',
+      name: 'tab_nav',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Book tutorial`
+  String get tab_book_course {
+    return Intl.message(
+      'Book tutorial',
+      name: 'tab_book_course',
       desc: '',
       args: [],
     );

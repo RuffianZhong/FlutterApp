@@ -35,7 +35,7 @@ class ThemeViewModel extends ChangeNotifier {
   }
 
   ///当前主题颜色
-  MaterialColor _themeColor = themeList[defaultThemeIndex];
+  MaterialColor _themeColor = themeList[7];
 
   MaterialColor get themeColor => _themeColor;
 
@@ -64,10 +64,59 @@ class ThemeViewModel extends ChangeNotifier {
 
   ///主题数据：主题颜色 和 暗黑模式 组合生成
   ThemeData get themeData {
+    Brightness brightness = darkMode ? Brightness.dark : Brightness.light;
+
+    ///暗黑主题
+    ColorScheme dark = const ColorScheme.dark().copyWith(
+      primary: themeColor[800],
+      primaryVariant: themeColor[900],
+      secondary: themeColor[800],
+      secondaryVariant: themeColor[900],
+    );
+
+    ///高亮主题
+    ColorScheme light = const ColorScheme.light().copyWith(
+      primary: themeColor,
+      primaryVariant: themeColor[700],
+      secondary: themeColor,
+      secondaryVariant: themeColor[700],
+    );
+
+    ///主题颜色值
+    Color color = darkMode ? themeColor[900]! : themeColor;
+
     ThemeData theme = ThemeData(
-      brightness: darkMode ? Brightness.dark : Brightness.light,
+      ///暗黑模式
+      brightness: brightness,
+
+      ///主题颜色
       primarySwatch: themeColor,
       primaryColor: themeColor,
+      colorScheme: darkMode ? dark : light,
+
+      ///单选按钮之类的颜色值
+      toggleableActiveColor: color,
+
+      ///导航栏指示器颜色
+      indicatorColor: darkMode ? themeColor : Colors.white,
+
+      ///文本主题
+      textTheme: TextTheme(
+        //item_main:18/black
+        titleMedium: TextStyle(
+            fontSize: 18,
+            color: darkMode ? Colors.grey[100] : Colors.grey[900]),
+        //item_sub:16/grey
+        bodyMedium: TextStyle(
+            fontSize: 16, color: darkMode ? Colors.grey : Colors.grey),
+        //label_main:14/midBlack
+        labelMedium: TextStyle(
+            fontSize: 14,
+            color: darkMode ? Colors.grey[300] : Colors.grey[700]),
+      ),
+
+      ///字体样式
+      // fontFamily: 'Georgia',
     );
     return theme;
   }

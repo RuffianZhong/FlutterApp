@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../res/color_res.dart';
-
 ///Loading弹窗
 ///网络请求等场景使用
 class LoadingDialogWidget extends StatelessWidget {

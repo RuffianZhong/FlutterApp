@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
+import 'package:flutter_wan_android/modules/article/widget/item_article_widget.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
 import 'package:provider/provider.dart';
 
 import '../../../generated/l10n.dart';
-import '../../../res/color_res.dart';
-import '../../../utils/log_util.dart';
-import '../../main/view/item_content_widget.dart';
 import '../view_model/search_view_model.dart';
 
 ///搜索页面
@@ -75,7 +73,6 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
             TextSelection.collapsed(offset: label.length);
       });
     }
-    Logger.log("-----actionSearch:${editingController.text}====id:$id");
 
     String submitValue = editingController.text;
     if (submitValue.isNotEmpty) {
@@ -136,7 +133,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
             border: InputBorder.none,
             hintText: S.of(context).search_hint,
             hintStyle:
-                TextStyle(fontSize: 15, color: Colors.white.withOpacity(0.3)),
+                Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 15),
             //后缀图标
             suffix: GestureDetector(
                 onTap: () {
@@ -191,7 +188,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
                 RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
                     arguments: viewModel.articleList[index]);
               },
-              child: ItemContentWidget(article: viewModel.articleList[index]));
+              child: ItemArticleWidget(article: viewModel.articleList[index]));
         },
         itemCount: viewModel.articleList.length,
       ),
@@ -239,7 +236,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
         Container(
             height: 50,
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            color: Colors.grey[100],
+            //  color: Colors.grey[100],
             child: Row(
               children: [
                 ///固定标题
@@ -254,8 +251,10 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
                     offstage: !deleteStyle,
                     child: TextButton(
                       child: Text(S.of(context).clean_all,
-                          style: const TextStyle(
-                              fontSize: 16, color: ColorRes.tContentMain)),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium
+                              ?.copyWith(fontSize: 16)),
                       onPressed: () => actionDelete(viewModel),
                     )),
 
@@ -267,8 +266,10 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
                           viewModel.editingData
                               ? S.of(context).done
                               : S.of(context).edit,
-                          style: const TextStyle(
-                              fontSize: 16, color: ColorRes.tContentMain)),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium
+                              ?.copyWith(fontSize: 16)),
                       onPressed: () {
                         viewModel.editingData = !viewModel.editingData;
                       },
@@ -290,8 +291,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
                 return InputChip(
                   label: Text(
                     value ?? "",
-                    style: const TextStyle(
-                        fontSize: 16, color: ColorRes.tContentSub),
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   onPressed: deleteStyle
                       ? null

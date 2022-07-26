@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/utils/log_util.dart';
 
-import '../generated/json/base/json_convert_content.dart';
-
 ///路由辅助类
 ///Navigator.push/pushXX<T> 定义 T 会报错，此处去除泛型定义，直接只用 dynamic
 class RouterHelper {

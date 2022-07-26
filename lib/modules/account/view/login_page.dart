@@ -13,6 +13,8 @@ import '../../../core/net/cancel/http_canceler.dart';
 import '../../../generated/l10n.dart';
 import '../../../utils/log_util.dart';
 import '../../../widget/loading_dialog_helper.dart';
+import '../widget/login_button.dart';
+import '../widget/login_text_field.dart';
 
 ///登录页面
 class LoginPage extends StatefulWidget {
@@ -191,8 +193,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
       child: Column(
         children: [
           ///账号
-          _textFieldWidget(
-              context: context,
+          LoginTextField(
               hintText: S.of(context).user_name,
               prefixIcon: Icons.perm_identity,
               suffixIcon: CupertinoIcons.clear,
@@ -205,8 +206,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
               onChanged: (_) => onTextChange(viewModel)),
 
           ///密码
-          _textFieldWidget(
-              context: context,
+          LoginTextField(
               hintText: S.of(context).user_psw,
               prefixIcon: Icons.lock_outline,
               suffixIcon: viewModel.obscureText
@@ -223,95 +223,11 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
           const SizedBox(height: 40),
 
           ///登录
-          _loginButtonWidget(context, viewModel)
+          LoginButton(
+              text: S.of(context).login,
+              canSubmit: viewModel.canLogin,
+              onPressed: () => actionLogin(context, viewModel)),
         ],
-      ),
-    );
-  }
-
-  ///登录按钮组件
-  Widget _loginButtonWidget(BuildContext context, LoginViewModel viewModel) {
-    return TextButton(
-      onPressed:
-          !viewModel.canLogin ? null : () => actionLogin(context, viewModel),
-      style: ButtonStyle(
-        ///背景
-        backgroundColor: MaterialStateProperty.resolveWith((states) {
-          //不可用状态
-          if (states.contains(MaterialState.disabled)) {
-            return Colors.grey[400];
-          }
-
-          //默认状态
-          return Theme.of(context).primaryColor;
-        }),
-
-        ///前景：字体
-        foregroundColor: MaterialStateProperty.resolveWith((states) {
-          //默认状态
-          return Colors.white;
-        }),
-
-        ///形状
-        shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(50))),
-
-        ///宽高：double.infinity填充父布局
-        minimumSize:
-            MaterialStateProperty.all(const Size(double.infinity, 50.0)),
-      ),
-      child: Text(S.of(context).login),
-    );
-  }
-
-  ///输入框组件
-  Widget _textFieldWidget(
-      {required BuildContext context,
-      required String hintText,
-      required IconData prefixIcon,
-      required IconData suffixIcon,
-      required bool obscureText,
-      required TextEditingController controller,
-      required TextInputAction textInputAction,
-      required VoidCallback onSuffixPressed,
-      FocusNode? focusNode,
-      ValueChanged<String>? onSubmitted,
-      ValueChanged<String>? onChanged}) {
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      child: TextField(
-        controller: controller,
-        onChanged: onChanged,
-
-        ///输入框装饰器
-        decoration: InputDecoration(
-          hintText: hintText,
-          //前缀图标
-          prefixIcon: Icon(
-            prefixIcon,
-            size: 28,
-            color: Theme.of(context).primaryColor,
-          ),
-          //后缀图标
-          suffix: IconButton(
-            onPressed: onSuffixPressed,
-            icon: Icon(suffixIcon, size: 24),
-          ),
-          //默认边框装饰
-          enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey[300]!)),
-          //获取焦点边框装饰
-          focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Theme.of(context).primaryColor)),
-        ),
-        cursorColor: Theme.of(context).primaryColor,
-        //密码模式
-        obscureText: obscureText,
-        //键盘完成按钮样式
-        textInputAction: textInputAction,
-        //完成按钮事件
-        onSubmitted: onSubmitted,
-        focusNode: focusNode,
       ),
     );
   }

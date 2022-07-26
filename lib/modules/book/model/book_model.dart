@@ -1,11 +1,11 @@
+import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/book/model/study_dao.dart';
 import 'package:flutter_wan_android/modules/book/model/study_entity.dart';
-import 'package:flutter_wan_android/modules/main/model/knowledge_model.dart';
+import 'package:flutter_wan_android/modules/knowledge/model/knowledge_model.dart';
 
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../core/net/http_request.dart';
 import '../../../core/net/http_result.dart';
-import '../../main/model/article_entity.dart';
 import 'book_entity.dart';
 
 class BookModel {
@@ -34,11 +34,7 @@ class BookModel {
     return model.getCategoryArticleList(projectId, pageIndex, canceler);
   }
 
-  late StudyDao dao;
-
-  BookModel() {
-    dao = StudyDao();
-  }
+  StudyDao dao = StudyDao();
 
   void close() {
     dao.close();

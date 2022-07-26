@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/core/net/cancel/zt_http_cancel.dart';
+import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
 import 'package:flutter_wan_android/modules/search/model/search_model.dart';
 
-import '../../main/model/article_entity.dart';
 
 ///SearchViewModel
 class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
-  late SearchModel model;
-
-  SearchViewModel() {
-    model = SearchModel();
-  }
+  SearchModel model = SearchModel();
 
   ///编辑数据模式
   bool _editingData = false;

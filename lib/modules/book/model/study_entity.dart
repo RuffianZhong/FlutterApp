@@ -21,4 +21,6 @@ class StudyEntity {
       required this.articleId,
       required this.progress,
       required this.time});
+
+  Map<String, dynamic> toJson() => {};
 }

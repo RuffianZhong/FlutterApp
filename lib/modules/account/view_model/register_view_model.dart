@@ -9,7 +9,7 @@ class RegisterViewModel extends ChangeNotifier {
     model = AccountModel();
   }
 
-  ///允许登录
+  ///允许注册
   bool _canRegister = false;
 
   bool get canRegister => _canRegister;

@@ -3,107 +3,15 @@ import 'package:flutter_wan_android/config/router_config.dart';
 import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
+import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/book/model/book_entity.dart';
-import 'package:flutter_wan_android/res/color_res.dart';
 import 'package:flutter_wan_android/utils/format_util.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/net/cancel/http_canceler.dart';
-import '../../../core/net/http_result.dart';
 import '../../../generated/l10n.dart';
 import '../../../utils/screen_util.dart';
-import '../../main/model/article_entity.dart';
-import '../model/book_model.dart';
 import '../model/study_entity.dart';
-
-class BookDetailsViewModel extends ChangeNotifier {
-  BookModel model = BookModel();
-
-  ///文章列表
-  List<ArticleEntity> _articleList = [];
-
-  List<ArticleEntity> get articleList => _articleList;
-
-  set articleList(List<ArticleEntity> value) {
-    _articleList = value;
-    notifyListeners();
-  }
-
-  ///获取内容列表
-  Future<HttpResult<ArticleEntity>> getArticleList(
-      int projectId, HttpCanceler canceler) async {
-    HttpResult<ArticleEntity> result =
-        await model.getBookArticleList(projectId, 0, canceler);
-    if (result.success) {
-      _articleList.addAll(result.list!);
-    }
-    return result;
-  }
-
-  ///学习进度列表
-  List<StudyEntity> _studyList = [];
-
-  ///获取学习列表数据：本地数据库
-  Future<List<StudyEntity>> getStudyListData(int bookId) async {
-    _studyList = await model.dao.query(bookId);
-    return _studyList;
-  }
-
-  ///初始化数据
-  void initData(int projectId, WidgetLifecycleOwner owner) {
-    ///多个 future
-    Iterable<Future> futures = [
-      getArticleList(projectId, HttpCanceler(owner)),
-      getStudyListData(projectId)
-    ];
-
-    ///等待多个 future 执行完成
-    Future.wait(futures).then((value) {
-      updateStudyData(_studyList, _articleList);
-    });
-  }
-
-  ///更新列表学习数据
-  void updateStudyData(
-      List<StudyEntity> studyList, List<ArticleEntity> articleList) {
-    if (studyList.isNotEmpty && articleList.isNotEmpty) {
-      StudyEntity study;
-      ArticleEntity article;
-
-      ///遍历学习进度列表
-      for (int i = 0; i < studyList.length; i++) {
-        study = studyList[i];
-
-        ///遍历文章（章节列表）
-        for (int j = 0; j < articleList.length; j++) {
-          article = articleList[j];
-
-          ///匹配/更新学习进度
-          if (article.id == study.articleId) {
-            article.study = study;
-            articleList[j] = article;
-            break;
-          }
-        }
-      }
-    }
-
-    ///更新viewModel数据
-    this.articleList = articleList;
-  }
-
-  ///插入或者更新数据
-  Future<StudyEntity> insertOrUpdateStudy(
-      int bookId, int articleId, double progress,
-      {int? id}) async {
-    StudyEntity study =
-        await model.insertOrUpdateStudy(id: id, bookId, articleId, progress);
-
-    updateStudyData([study], _articleList);
-
-    return study;
-  }
-}
+import '../view_model/book_details_view_model.dart';
 
 class BookDetailsPage extends StatefulWidget {
   const BookDetailsPage({Key? key}) : super(key: key);
@@ -122,6 +30,7 @@ class _BookDetailsPageState extends ZTLifecycleState<BookDetailsPage>
   initState() {
     super.initState();
     getLifecycle().addObserver(this);
+    getLifecycle().addObserver(BookDetailsViewModel());
   }
 
   @override
@@ -355,7 +264,7 @@ class _SliverListWidgetState extends State<SliverListWidget> {
           children: [
             ///标题
             Text("${index + 1}.${article.title}",
-                style: const TextStyle(fontSize: 18)),
+                style: Theme.of(context).textTheme.titleMedium),
 
             const SizedBox(width: 14),
 
@@ -363,8 +272,10 @@ class _SliverListWidgetState extends State<SliverListWidget> {
             Offstage(
               offstage: article.study != null,
               child: Text(S.of(context).learn_no,
-                  style: const TextStyle(
-                      fontSize: 14, color: ColorRes.tContentSub)),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontSize: 14)),
             ),
 
             ///进度
@@ -402,8 +313,10 @@ class _SliverListWidgetState extends State<SliverListWidget> {
                             : FormatUtil.formatMilliseconds(
                                     FormatUtil.ymdHms, article.study!.time)
                                 .toString(),
-                        style: const TextStyle(
-                            fontSize: 12, color: ColorRes.tContentSub)),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(fontSize: 12)),
                   ],
                 )),
 

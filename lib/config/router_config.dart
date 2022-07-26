@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_wan_android/modules/account/view/login_page.dart';
+import 'package:flutter_wan_android/modules/account/view/register_page.dart';
+import 'package:flutter_wan_android/modules/article/view/article_details_page.dart';
 import 'package:flutter_wan_android/modules/book/view/book_details_page.dart';
-import 'package:flutter_wan_android/modules/details/view/article_details_page.dart';
-import 'package:flutter_wan_android/modules/main/view/collection_list_page.dart';
-import 'package:flutter_wan_android/modules/main/view/knowledge_child_page.dart';
-
-import '../modules/account/view/login_page.dart';
-import '../modules/account/view/register_page.dart';
-import '../modules/search/view/search_page.dart';
+import 'package:flutter_wan_android/modules/collect/view/collection_list_page.dart';
+import 'package:flutter_wan_android/modules/knowledge/view/knowledge_child_page.dart';
+import 'package:flutter_wan_android/modules/search/view/search_page.dart';
 
 ///路由配置
 class RouterConfig {

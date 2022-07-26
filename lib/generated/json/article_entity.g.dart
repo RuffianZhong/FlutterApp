@@ -1,6 +1,8 @@
 import 'package:flutter_wan_android/generated/json/base/json_convert_content.dart';
-import 'package:flutter_wan_android/modules/main/model/article_entity.dart';
+import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
+
+import 'package:flutter_wan_android/modules/book/model/study_entity.dart';
 
 import '../../../generated/json/base/json_convert_content.dart';
 
@@ -39,17 +41,29 @@ ArticleEntity $ArticleEntityFromJson(Map<String, dynamic> json) {
 	if (chapterName != null) {
 		articleEntity.chapterName = chapterName;
 	}
+	final int? chapterId = jsonConvert.convert<int>(json['chapterId']);
+	if (chapterId != null) {
+		articleEntity.chapterId = chapterId;
+	}
 	final String? desc = jsonConvert.convert<String>(json['desc']);
 	if (desc != null) {
 		articleEntity.desc = desc;
 	}
-	final String? cover = jsonConvert.convert<String>(json['cover']);
+	final String? cover = jsonConvert.convert<String>(json['envelopePic']);
 	if (cover != null) {
 		articleEntity.cover = cover;
 	}
 	final bool? isTop = jsonConvert.convert<bool>(json['isTop']);
 	if (isTop != null) {
 		articleEntity.isTop = isTop;
+	}
+	final bool? collect = jsonConvert.convert<bool>(json['collect']);
+	if (collect != null) {
+		articleEntity.collect = collect;
+	}
+	final StudyEntity? study = jsonConvert.convert<StudyEntity>(json['study']);
+	if (study != null) {
+		articleEntity.study = study;
 	}
 	return articleEntity;
 }
@@ -64,8 +78,11 @@ Map<String, dynamic> $ArticleEntityToJson(ArticleEntity entity) {
 	data['niceDate'] = entity.date;
 	data['superChapterName'] = entity.superChapterName;
 	data['chapterName'] = entity.chapterName;
+	data['chapterId'] = entity.chapterId;
 	data['desc'] = entity.desc;
-	data['cover'] = entity.cover;
+	data['envelopePic'] = entity.cover;
 	data['isTop'] = entity.isTop;
+	data['collect'] = entity.collect;
+	data['study'] = entity.study?.toJson();
 	return data;
 }
