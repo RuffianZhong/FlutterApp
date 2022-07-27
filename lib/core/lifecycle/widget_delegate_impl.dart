@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+
 import '../lifecycle/widget_delegate.dart';
 import '../lifecycle/widget_lifecycle_observable.dart';
 import '../lifecycle/widget_lifecycle_observable_impl.dart';
@@ -99,33 +100,40 @@ class WidgetDelegateImpl
   /// 2.1 全屏：展示：inactive > paused 消失：resumed
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed: //恢复交互
+    /// flutter 所有界面都在同一个Activity/Controller中，因此所有页面都能响应切换前后台的回调
+    /// 此处逻辑只需要栈顶页面需要响应 挂起/恢复 回调
+    bool isCurrent = _modalRoute?.isCurrent ?? false;
+    if (isCurrent) {
+      switch (state) {
+        case AppLifecycleState.resumed: //恢复交互
+          /// 如果执行了 AppLifecycleState.paused 则需要从 onStart 开始
+          if (callStartStateWhenForeground) {
+            _observable.setCurrentState(WidgetLifecycleState.onStart);
+            callStartStateWhenForeground = false;
+          }
 
-        /// 如果执行了 AppLifecycleState.paused 则需要从 onStart 开始
-        if (callStartStateWhenForeground) {
-          _observable.setCurrentState(WidgetLifecycleState.onStart);
-          callStartStateWhenForeground = false;
-        }
+          _observable.setCurrentState(WidgetLifecycleState.onResume);
 
-        _observable.setCurrentState(WidgetLifecycleState.onResume);
+          break;
+        case AppLifecycleState.inactive: //挂起
 
-        break;
-      case AppLifecycleState.inactive: //挂起
+          ///进入后台 和 从桌面回来 都会执行 inactive 回调，添加逻辑，去除从后台回来的多余执行
+          if (!callStartStateWhenForeground) {
+            _observable.setCurrentState(WidgetLifecycleState.onPause);
+          }
 
-        _observable.setCurrentState(WidgetLifecycleState.onPause);
+          break;
+        case AppLifecycleState.paused: //停止
 
-        break;
-      case AppLifecycleState.paused: //停止
+          ///切后台执行了 AppLifecycleState.paused ，则认为回到前台生命周期从 onStart 开始
+          callStartStateWhenForeground = true;
 
-        ///切后台执行了 AppLifecycleState.paused ，则认为回到前台生命周期从 onStart 开始
-        callStartStateWhenForeground = true;
-
-        _observable.setCurrentState(WidgetLifecycleState.onStop);
-        break;
-      case AppLifecycleState.detached: //销毁
-        _observable.setCurrentState(WidgetLifecycleState.onDestroy);
-        break;
+          _observable.setCurrentState(WidgetLifecycleState.onStop);
+          break;
+        case AppLifecycleState.detached: //销毁
+          _observable.setCurrentState(WidgetLifecycleState.onDestroy);
+          break;
+      }
     }
   }
 

@@ -1,3 +1,4 @@
+import '../../utils/log_util.dart';
 import '../lifecycle/widget_lifecycle_observable.dart';
 import '../lifecycle/widget_lifecycle_observer.dart';
 import '../lifecycle/widget_lifecycle_owner.dart';
@@ -26,12 +27,12 @@ class WidgetLifecycleObservableImpl implements WidgetLifecycleObservable {
   @override
   void addObserver(WidgetLifecycleObserver observer) {
     LifecycleObserverDispatcher observerDispatcher =
-        LifecycleObserverDispatcher(observer);
+        LifecycleObserverDispatcher(_owner, observer);
 
     _observerMap.putIfAbsent(observer, () => observerDispatcher);
 
     /// 延迟/补充生命周期分发，如果需要的话
-    observerDispatcher.dispatchStateIfNeed(_owner, _widgetLifecycleState);
+    observerDispatcher.dispatchStateIfNeed(_widgetLifecycleState);
   }
 
   @override
@@ -40,18 +41,31 @@ class WidgetLifecycleObservableImpl implements WidgetLifecycleObservable {
   }
 
   /// 设置当前 widget 生命周期
-  void setCurrentState(WidgetLifecycleState state) {
+  void setCurrentState(WidgetLifecycleState state) async {
     _widgetLifecycleState = state;
+    Logger.log("===set==${_observerMap.length}");
+    Logger.log("");
     _dispatchState(state);
   }
 
   /// 分发当前 widget 生命周期，通知所有被观察者
   void _dispatchState(WidgetLifecycleState state) {
-    if (_observerMap.isEmpty) return;
+    ///copy方式解决并发修改Map
+    Map<WidgetLifecycleObserver, LifecycleObserverDispatcher> map =
+        Map.from(_observerMap);
 
-    _observerMap.forEach((key, value) {
-      value.dispatchState(_owner, state);
+    if (map.isEmpty) return;
+
+    map.forEach((key, value) {
+      Logger.log("===for==$_owner--::${key.toString()}--::$state");
+      value.dispatchState(state);
+
+      ///分发完onDestroy之后移除对象
+      if (state == WidgetLifecycleState.onDestroy) {
+        removeObserver(key);
+      }
     });
+    Logger.log("");
   }
 }
 
@@ -60,50 +74,52 @@ class WidgetLifecycleObservableImpl implements WidgetLifecycleObservable {
 /// 延迟分发：如果 观察者 在 widget 初始化时注册，那么两者生命周期一直保持同步；如果 观察者 在 widget 生周期中后期才注册，则会丢失已经过去的前期生命周期回调，需要补上
 class LifecycleObserverDispatcher {
   /// 观察者
-  final WidgetLifecycleObserver _observer;
+  final WidgetLifecycleObserver observer;
 
-  LifecycleObserverDispatcher(this._observer);
+  /// 生命周期感知对象
+  final WidgetLifecycleOwner owner;
+
+  LifecycleObserverDispatcher(this.owner, this.observer);
 
   /// 常规分发：观察者生命周期事件分发
-  void dispatchState(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
+  void dispatchState(WidgetLifecycleState state) {
     /// 生命周期改变回调
-    _observer.onStateChanged(owner, state);
+    observer.onStateChanged(owner, state);
   }
 
   /// 延迟分发：如果 观察者 在 widget 初始化时注册，那么两者生命周期一直保持同步；如果 观察者 在 widget 生周期中后期才注册，则会丢失已经过去的前期生命周期回调，需要补上
   /// 延迟/补充的生命周期分发
   /// 如果用户 #addObserver 时机较晚，会导致前期对应的生命周期丢失，这里延迟分发
-  void dispatchStateIfNeed(
-      WidgetLifecycleOwner owner, WidgetLifecycleState state) {
+  void dispatchStateIfNeed(WidgetLifecycleState state) {
     int stateIndex = state.index;
 
     if (stateIndex >= WidgetLifecycleState.onInit.index) {
-      dispatchState(owner, WidgetLifecycleState.onInit);
+      dispatchState(WidgetLifecycleState.onInit);
     }
 
     if (stateIndex >= WidgetLifecycleState.onCreate.index) {
-      dispatchState(owner, WidgetLifecycleState.onCreate);
+      dispatchState(WidgetLifecycleState.onCreate);
     }
 
     if (stateIndex >= WidgetLifecycleState.onStart.index) {
-      dispatchState(owner, WidgetLifecycleState.onStart);
+      dispatchState(WidgetLifecycleState.onStart);
     }
 
     if (stateIndex >= WidgetLifecycleState.onResume.index) {
-      dispatchState(owner, WidgetLifecycleState.onResume);
+      dispatchState(WidgetLifecycleState.onResume);
     }
 
     /// 以下条件几乎不会触发
     if (stateIndex >= WidgetLifecycleState.onPause.index) {
-      dispatchState(owner, WidgetLifecycleState.onPause);
+      dispatchState(WidgetLifecycleState.onPause);
     }
 
     if (stateIndex >= WidgetLifecycleState.onStop.index) {
-      dispatchState(owner, WidgetLifecycleState.onStop);
+      dispatchState(WidgetLifecycleState.onStop);
     }
 
     if (stateIndex >= WidgetLifecycleState.onDestroy.index) {
-      dispatchState(owner, WidgetLifecycleState.onDestroy);
+      dispatchState(WidgetLifecycleState.onDestroy);
     }
   }
 }
