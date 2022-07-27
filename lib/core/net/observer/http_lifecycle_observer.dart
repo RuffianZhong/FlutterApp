@@ -1,6 +1,6 @@
-import '../cancel/http_canceler.dart';
-import '../cancel/http_cancel_manager.dart';
 import '../../lifecycle/zt_lifecycle.dart';
+import '../cancel/http_cancel_manager.dart';
+import '../cancel/http_canceler.dart';
 
 class HttpLifecycleObserver implements WidgetLifecycleObserver {
   /// http取消管理类
@@ -14,8 +14,6 @@ class HttpLifecycleObserver implements WidgetLifecycleObserver {
 
   @override
   void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    print("---test-----come:$state----owner:$owner");
-
     /// 目标组件，目标生命周期状态：取消网络请求
     if (httpCanceler.lifecycleOwner == owner &&
         httpCanceler.lifecycleState == state) {

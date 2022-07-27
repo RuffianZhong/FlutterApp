@@ -1,2 +1,5 @@
 /// 取消器
-abstract class Canceler {}
+abstract class Canceler {
+  ///取消
+  void cancel({dynamic reason});
+}

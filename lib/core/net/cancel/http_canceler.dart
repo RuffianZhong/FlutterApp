@@ -12,4 +12,9 @@ class HttpCanceler implements Canceler {
       {CancelToken? cancelToken, WidgetLifecycleState? lifecycleState})
       : cancelToken = cancelToken ?? CancelToken(),
         lifecycleState = lifecycleState ?? WidgetLifecycleState.onDestroy;
+
+  @override
+  void cancel({reason}) {
+    cancelToken.cancel(reason);
+  }
 }
