@@ -1,4 +1,4 @@
-import 'db_helper.dart';
+import '../helper/db_helper.dart';
 
 ///数据库操作相关Dao抽象基类
 abstract class AbsDao {

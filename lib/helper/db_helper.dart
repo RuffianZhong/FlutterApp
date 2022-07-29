@@ -1,7 +1,6 @@
 import 'package:flutter_wan_android/modules/book/model/study_dao.dart';
+import 'package:flutter_wan_android/modules/search/model/search_dao.dart';
 import 'package:sqflite/sqflite.dart';
-
-import '../../modules/search/model/search_dao.dart';
 
 ///数据库辅助类
 class SqliteHelper {
