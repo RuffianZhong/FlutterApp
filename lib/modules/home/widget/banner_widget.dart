@@ -1,13 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/core/net/cancel/http_canceler.dart';
 import 'package:flutter_wan_android/modules/home/model/banner_entity.dart';
 import 'package:flutter_wan_android/modules/home/model/home_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../helper/image_helper.dart';
+import '../../../utils/log_util.dart';
 
 ///Banner控件
 class BannerWidget extends StatefulWidget {
@@ -17,23 +21,19 @@ class BannerWidget extends StatefulWidget {
   State<BannerWidget> createState() => _BannerWidgetState();
 }
 
-class _BannerWidgetState extends ZTLifecycleState<BannerWidget>
-    with WidgetLifecycleObserver {
-  late BuildContext _buildContext;
+class _BannerWidgetState extends State<BannerWidget> with Lifecycle {
+  final BannerViewModel bannerViewModel = BannerViewModel();
 
   @override
   void initState() {
     super.initState();
-    getLifecycle().addObserver(BannerViewModel());
-    getLifecycle().addObserver(this);
+    getLifecycle().addObserver(bannerViewModel);
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => BannerViewModel())
-      ],
+      providers: [ChangeNotifierProvider(create: (context) => bannerViewModel)],
       child: bannerWidget(),
     );
   }
@@ -53,7 +53,6 @@ class _BannerWidgetState extends ZTLifecycleState<BannerWidget>
   ///指示器
   Widget indicator() {
     return Consumer<BannerViewModel>(builder: (context, viewModel, child) {
-      _buildContext = context;
       return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: indicatorChild(viewModel));
@@ -101,17 +100,10 @@ class _BannerWidgetState extends ZTLifecycleState<BannerWidget>
       );
     });
   }
-
-  @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
-      _buildContext.read<BannerViewModel>().getBannerList(owner);
-    }
-  }
 }
 
 ///BannerViewModel
-class BannerViewModel extends ChangeNotifier with WidgetLifecycleObserver {
+class BannerViewModel extends ChangeNotifier with LifecycleObserver {
   ///循环数量
   final int _loopCount = 10;
 
@@ -134,10 +126,11 @@ class BannerViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   }
 
   HomeModel model = HomeModel();
+  late HttpCanceler httpCanceler;
 
   ///获取banner列表
-  void getBannerList(WidgetLifecycleOwner owner) {
-    model.getBannerList(HttpCanceler(owner)).then((value) {
+  void getBannerList() {
+    model.getBannerList(httpCanceler).then((value) {
       if (value.success) {
         dataArray = value.list!;
       }
@@ -153,8 +146,12 @@ class BannerViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   ///开始定时器
   void startLoop() {
     _timer ??= Timer.periodic(_duration, (timer) {
-      ///下一页
-      controller.nextPage(duration: _duration, curve: Curves.linear);
+      try {
+        ///下一页
+        controller.nextPage(duration: _duration, curve: Curves.linear);
+      } catch (e) {
+        Logger.log(e);
+      }
     });
   }
 
@@ -216,8 +213,12 @@ class BannerViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   int get itemCount => _loopCount;
 
   @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onDestroy) {
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onInit) {
+      httpCanceler = HttpCanceler(owner);
+    } else if (state == LifecycleState.onCreate) {
+      getBannerList();
+    } else if (state == LifecycleState.onDestroy) {
       destroy();
     }
   }

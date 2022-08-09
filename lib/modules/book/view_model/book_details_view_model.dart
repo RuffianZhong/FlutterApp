@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 
-import '../../../core/lifecycle/zt_lifecycle.dart';
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../../core/net/http_result.dart';
 import '../model/book_model.dart';
 import '../model/study_entity.dart';
 
-class BookDetailsViewModel extends ChangeNotifier with WidgetLifecycleObserver {
+class BookDetailsViewModel extends ChangeNotifier with LifecycleObserver {
   @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onDestroy) {
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onInit) {
+      httpCanceler = HttpCanceler(owner);
+    } else if (state == LifecycleState.onDestroy) {
       model.close();
     }
   }
+
+  late HttpCanceler httpCanceler;
 
   BookModel model = BookModel();
 
@@ -28,10 +34,9 @@ class BookDetailsViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   }
 
   ///获取内容列表
-  Future<HttpResult<ArticleEntity>> getArticleList(
-      int projectId, HttpCanceler canceler) async {
+  Future<HttpResult<ArticleEntity>> getArticleList(int projectId) async {
     HttpResult<ArticleEntity> result =
-        await model.getBookArticleList(projectId, 0, canceler);
+        await model.getBookArticleList(projectId, 0, httpCanceler);
     if (result.success) {
       _articleList.addAll(result.list!);
     }
@@ -48,10 +53,10 @@ class BookDetailsViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   }
 
   ///初始化数据
-  void initData(int projectId, WidgetLifecycleOwner owner) {
+  void initData(int projectId) {
     ///多个 future
     Iterable<Future> futures = [
-      getArticleList(projectId, HttpCanceler(owner)),
+      getArticleList(projectId),
       getStudyListData(projectId)
     ];
 

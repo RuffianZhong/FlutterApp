@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/utils/toast_util.dart';
 import 'package:flutter_wan_android/widget/loading_dialog_helper.dart';
@@ -22,7 +22,7 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
+class _RegisterPageState extends State<RegisterPage> with Lifecycle {
   ///账号Controller
   final TextEditingController _accountController = TextEditingController();
 
@@ -37,6 +37,15 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
 
   ///确认密码焦点
   final _pswConfirmNode = FocusNode();
+
+  ///HttpCanceler
+  late HttpCanceler httpCanceler;
+
+  @override
+  void initState() {
+    super.initState();
+    httpCanceler = HttpCanceler(this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +90,7 @@ class _RegisterPageState extends ZTLifecycleState<RegisterPage> {
 
     ///注册
     viewModel.model
-        .register(account, psw, pswConfirm, HttpCanceler(this))
+        .register(account, psw, pswConfirm, httpCanceler)
         .then((result) {
           if (result.success) {
             ToastUtil.showToast(msg: S.of(context).register_success);

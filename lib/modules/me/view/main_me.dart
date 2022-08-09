@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/generated/l10n.dart';
-import 'package:flutter_wan_android/helper/cookie_helper.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
@@ -18,7 +17,6 @@ import 'package:flutter_wan_android/widget/loading_dialog_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../../config/hero_config.dart';
-import '../../../core/net/cancel/http_canceler.dart';
 import '../../../utils/log_util.dart';
 
 class MainMePage extends StatefulWidget {
@@ -28,30 +26,34 @@ class MainMePage extends StatefulWidget {
   State<MainMePage> createState() => _MainMePageState();
 }
 
-class _MainMePageState extends ZTLifecycleState<MainMePage>
-    with AutomaticKeepAliveClientMixin, WidgetLifecycleObserver {
+class _MainMePageState extends State<MainMePage>
+    with Lifecycle, AutomaticKeepAliveClientMixin {
+  final MeViewModel meViewModel = MeViewModel();
+
   @override
   void initState() {
     super.initState();
-    getLifecycle().addObserver(this);
+    getLifecycle().addObserver(meViewModel);
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(body: Consumer<MeViewModel>(
-      builder: (context, viewModel, child) {
-        return _bodyContent(context, viewModel);
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (context) => meViewModel)],
+      builder: (context, child) {
+        return Scaffold(
+            body: _bodyContent(context, context.read<MeViewModel>()));
       },
-    ));
+    );
   }
 
   ///退出登录
   void actionLogout(BuildContext context, MeViewModel viewModel) {
     LoadingDialogHelper.showLoading(context);
     viewModel.model
-        .logout(HttpCanceler(this))
+        .logout()
         .then((value) {
           if (value.success) {
             viewModel.isLogin = false;
@@ -64,15 +66,14 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
   }
 
   ///用户头像事件
-  void actionUserIcon(BuildContext context, MeViewModel viewModel) {
+  void actionUserIcon(BuildContext context, MeViewModel viewModel) async {
     if (viewModel.isLogin) {
       ///放大
       RouterHelper.push(context, PreviewPage(viewModel.userEntity.icon ?? ""),
           fullscreenDialog: true);
     } else {
       ///去登录
-      RouterHelper.push(context, const LoginPage(), fullscreenDialog: true)
-          .then((value) {
+      RouterHelper.push(context, const LoginPage()).then((value) {
         Logger.log("---------me-------------$value");
 
         ///刷新用户数据
@@ -370,18 +371,4 @@ class _MainMePageState extends ZTLifecycleState<MainMePage>
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
-      /// 首帧绘制完成
-      /// 初始化数据
-      MeViewModel viewModel = context.read<MeViewModel>();
-      viewModel.initLocalData(context);
-      viewModel.initThemeData(context);
-      viewModel.initUserData();
-    } else if (state == WidgetLifecycleState.onResume) {
-      CookieHelper.getCookie();
-    }
-  }
 }

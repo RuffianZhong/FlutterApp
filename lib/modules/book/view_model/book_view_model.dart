@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 
-import '../../../core/lifecycle/widget_lifecycle_owner.dart';
 import '../../../core/net/cancel/http_canceler.dart';
 import '../../book/model/book_entity.dart';
 import '../../book/model/book_model.dart';
 
-class BookViewModel extends ChangeNotifier {
+class BookViewModel extends ChangeNotifier with LifecycleObserver {
+  late HttpCanceler httpCanceler;
   BookModel model = BookModel();
 
   ///教程列表
@@ -19,11 +22,20 @@ class BookViewModel extends ChangeNotifier {
   }
 
   ///获取教程列表
-  void getBookList(WidgetLifecycleOwner owner) {
-    model.getBookList(HttpCanceler(owner)).then((value) {
+  void getBookList() {
+    model.getBookList(httpCanceler).then((value) {
       if (value.success) {
         dataArray = value.list!;
       }
     });
+  }
+
+  @override
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onInit) {
+      httpCanceler = HttpCanceler(owner);
+    } else if (state == LifecycleState.onCreate) {
+      getBookList();
+    }
   }
 }

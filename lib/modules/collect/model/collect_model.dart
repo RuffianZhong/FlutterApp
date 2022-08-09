@@ -40,26 +40,13 @@ class CollectModel {
     return result;
   }
 
-  ///收藏文章
-  Future<HttpResult> collectArticle(int articleId,
+  ///收藏或取消文章
+  Future<HttpResult> collectOrCancelArticle(int articleId, bool collect,
       {HttpCanceler? canceler}) async {
     ///参数
-    String api = collectArticleApi.replaceAll("%1", articleId.toString());
+    String api = collect ? collectArticleApi : unCollectArticleApi;
 
-    ///结果
-    Map<String, dynamic> json = await HttpRequest.post(api, canceler: canceler);
-
-    ///解析
-    HttpResult result = HttpResult().convert(json);
-
-    return result;
-  }
-
-  ///取消收藏文章
-  Future<HttpResult> unCollectArticle(int articleId,
-      {HttpCanceler? canceler}) async {
-    ///参数
-    String api = unCollectArticleApi.replaceAll("%1", articleId.toString());
+    api = api.replaceAll("%1", articleId.toString());
 
     ///结果
     Map<String, dynamic> json = await HttpRequest.post(api, canceler: canceler);

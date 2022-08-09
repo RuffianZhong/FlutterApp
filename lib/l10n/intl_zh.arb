@@ -40,5 +40,9 @@
   "net_error": "网络错误",
   "tab_tree": "体系",
   "tab_nav": "导航",
-  "tab_book_course": "书籍教程"
+  "tab_book_course": "书籍教程",
+  "tips_msg": "提示",
+  "cancel": "取消",
+  "confirm": "确定",
+  "collect_content": "您确定要移除收藏内容吗？"
 }

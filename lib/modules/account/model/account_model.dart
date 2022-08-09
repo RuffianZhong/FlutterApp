@@ -48,7 +48,7 @@ class AccountModel {
   }
 
   ///退出登录
-  Future<HttpResult> logout(HttpCanceler? canceler) async {
+  Future<HttpResult> logout({HttpCanceler? canceler}) async {
     ///结果
     Map<String, dynamic> value =
         await HttpRequest.get(logoutApi, canceler: canceler);

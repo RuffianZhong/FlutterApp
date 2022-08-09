@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/modules/book/view/main_book.dart';
-import 'package:flutter_wan_android/modules/book/view_model/book_view_model.dart';
 import 'package:flutter_wan_android/modules/home/view/main_home.dart';
-import 'package:flutter_wan_android/modules/home/view_model/home_view_model.dart';
 import 'package:flutter_wan_android/modules/knowledge/view/main_knowledge.dart';
-import 'package:flutter_wan_android/modules/knowledge/view_model/knowledge_view_model.dart';
 import 'package:flutter_wan_android/modules/me/view/main_me.dart';
-import 'package:flutter_wan_android/modules/me/view_model/me_view_model.dart';
 import 'package:flutter_wan_android/modules/project/view/main_project.dart';
-import 'package:flutter_wan_android/modules/project/view_model/project_view_model.dart';
-import 'package:provider/provider.dart';
 
 import '../../../generated/l10n.dart';
 
@@ -38,18 +32,10 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => MeViewModel()),
-          ChangeNotifierProvider(create: (context) => ProjectViewModel()),
-          ChangeNotifierProvider(create: (context) => KnowledgeViewModel()),
-          ChangeNotifierProvider(create: (context) => BookViewModel()),
-          ChangeNotifierProvider(create: (context) => HomeViewModel()),
-        ],
-        child: Scaffold(
-          body: _bodyContent(),
-          bottomNavigationBar: _bottomNavigationBar(),
-        ));
+    return Scaffold(
+      body: _bodyContent(),
+      bottomNavigationBar: _bottomNavigationBar(),
+    );
   }
 
   @override
@@ -90,9 +76,9 @@ class _MainPageState extends State<MainPage> {
         _bottomNavigationBarItem(S.of(context).tab_home, "ic_tab_home.png"),
         _bottomNavigationBarItem(
             S.of(context).tab_project, "ic_tab_project.png"),
-        _bottomNavigationBarItem(S.of(context).tab_book, "ic_tab_square.png"),
+        _bottomNavigationBarItem(S.of(context).tab_book, "ic_tab_book.png"),
         _bottomNavigationBarItem(
-            S.of(context).tab_knowledge, "ic_tab_wechat.png"),
+            S.of(context).tab_knowledge, "ic_tab_knowledge.png"),
         _bottomNavigationBarItem(S.of(context).tab_me, "ic_tab_me.png"),
       ],
       selectedItemColor: Theme.of(context).primaryColor,

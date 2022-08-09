@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/core/net/http_result.dart';
-import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/home/model/banner_entity.dart';
-import 'package:flutter_wan_android/utils/log_util.dart';
 
-import '../../../core/lifecycle/zt_lifecycle.dart';
 import '../../../core/net/cancel/http_canceler.dart';
 import '../model/home_model.dart';
 
-class HomeViewModel extends ChangeNotifier {
+class HomeViewModel extends ChangeNotifier with LifecycleObserver {
+  ///HttpCanceler
+  late HttpCanceler canceler;
+
   ///model
   late HomeModel model;
 
@@ -61,8 +64,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   ///获取内容列表
-  Future<HttpResult<ArticleEntity>> getArticleList(
-      bool refresh, HttpCanceler canceler) async {
+  Future<HttpResult<ArticleEntity>> getArticleList(bool refresh) async {
     ///下拉刷新，下标从0开始
     if (refresh) pageIndex = 0;
     HttpResult<ArticleEntity> result =
@@ -84,5 +86,16 @@ class HomeViewModel extends ChangeNotifier {
       articleTopList = result.list ?? [];
     }
     return result;
+  }
+
+  @override
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onInit) {
+      canceler = HttpCanceler(owner);
+    } else if (state == LifecycleState.onCreate) {
+      /// 首帧绘制完成
+      /// 初始化数据
+      getArticleList(true);
+    }
   }
 }

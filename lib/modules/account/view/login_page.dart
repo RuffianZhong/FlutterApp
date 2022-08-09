@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/account/view_model/login_view_model.dart';
@@ -24,13 +27,15 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ZTLifecycleState<LoginPage>
-    with WidgetLifecycleObserver {
+class _LoginPageState extends State<LoginPage>
+    with Lifecycle, LifecycleObserver {
   late BuildContext _buildContext;
+  late HttpCanceler httpCanceler;
 
   @override
   void initState() {
     super.initState();
+    httpCanceler = HttpCanceler(this);
     getLifecycle().addObserver(this);
   }
 
@@ -64,7 +69,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
 
     ///登录
     viewModel.model
-        .login(account, psw, HttpCanceler(this))
+        .login(account, psw, httpCanceler)
         .then((result) {
           if (result.success) {
             ToastUtil.showToast(msg: S.of(context).login_success);
@@ -92,7 +97,7 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
   }
 
   ///返回操作
-  void actionBack(BuildContext context1, bool isLogin) {
+  void actionBack(BuildContext context, bool isLogin) {
     RouterHelper.pop<bool>(context, isLogin);
   }
 
@@ -252,8 +257,8 @@ class _LoginPageState extends ZTLifecycleState<LoginPage>
   }
 
   @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onCreate) {
       initData(_buildContext);
     }
   }

@@ -469,6 +469,46 @@ class S {
       args: [],
     );
   }
+
+  /// `Tips`
+  String get tips_msg {
+    return Intl.message(
+      'Tips',
+      name: 'tips_msg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm`
+  String get confirm {
+    return Intl.message(
+      'Confirm',
+      name: 'confirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure remove the collected content?`
+  String get collect_content {
+    return Intl.message(
+      'Are you sure remove the collected content?',
+      name: 'collect_content',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

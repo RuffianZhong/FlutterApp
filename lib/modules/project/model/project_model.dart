@@ -14,7 +14,7 @@ class ProjectModel {
 
   ///获取项目分配
   Future<HttpResult<CategoryEntity>> getProjectTree(
-      HttpCanceler canceler) async {
+      {HttpCanceler? canceler}) async {
     ///结果
     Map<String, dynamic> json =
         await HttpRequest.get(projectTreeApi, canceler: canceler);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:provider/provider.dart';
@@ -16,24 +16,29 @@ class MainBookPage extends StatefulWidget {
   State<MainBookPage> createState() => _MainBookPageState();
 }
 
-class _MainBookPageState extends ZTLifecycleState<MainBookPage>
-    with AutomaticKeepAliveClientMixin, WidgetLifecycleObserver {
-  late BuildContext _buildContext;
+class _MainBookPageState extends State<MainBookPage>
+    with AutomaticKeepAliveClientMixin, Lifecycle {
+  final BookViewModel bookViewModel = BookViewModel();
 
   @override
   void initState() {
     super.initState();
-    getLifecycle().addObserver(this);
+    getLifecycle().addObserver(bookViewModel);
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(S.of(context).tab_book_course),
-        ),
-        body: bodyContent());
+    return ChangeNotifierProvider(
+      create: (_) => bookViewModel,
+      builder: (context, child) {
+        return Scaffold(
+            appBar: AppBar(
+              title: Text(S.of(context).tab_book_course),
+            ),
+            body: bodyContent());
+      },
+    );
   }
 
   void actionItemClick(BookEntity book) {
@@ -43,7 +48,6 @@ class _MainBookPageState extends ZTLifecycleState<MainBookPage>
 
   Widget bodyContent() {
     return Consumer<BookViewModel>(builder: (context, viewModel, child) {
-      _buildContext = context;
       return GridView.builder(
           padding: const EdgeInsets.all(15),
           itemCount: viewModel.dataArray.length,
@@ -69,12 +73,4 @@ class _MainBookPageState extends ZTLifecycleState<MainBookPage>
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
-      BookViewModel viewModel = _buildContext.read<BookViewModel>();
-      viewModel.getBookList(owner);
-    }
-  }
 }

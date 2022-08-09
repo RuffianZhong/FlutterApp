@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
-import 'package:flutter_wan_android/core/net/cancel/http_canceler.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
-import 'package:flutter_wan_android/modules/article/widget/item_article_widget.dart';
 import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
+import 'package:flutter_wan_android/modules/article/widget/item_article_widget.dart';
 import 'package:flutter_wan_android/modules/collect/model/collect_model.dart';
 import 'package:flutter_wan_android/modules/home/view_model/home_view_model.dart';
 import 'package:flutter_wan_android/modules/home/widget/banner_widget.dart';
+import 'package:flutter_wan_android/widget/loading_dialog_helper.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/lifecycle/zt_lifecycle.dart';
 import '../../../core/net/http_result.dart';
 import '../../../generated/l10n.dart';
 import '../../../utils/screen_util.dart';
@@ -24,20 +24,18 @@ class MainHomePage extends StatefulWidget {
   State<MainHomePage> createState() => _MainHomePageState();
 }
 
-class _MainHomePageState extends ZTLifecycleState<MainHomePage>
-    with WidgetLifecycleObserver, AutomaticKeepAliveClientMixin {
-  late BuildContext _buildContext;
-  late HttpCanceler canceler;
-
+class _MainHomePageState extends State<MainHomePage>
+    with Lifecycle, AutomaticKeepAliveClientMixin {
+  final HomeViewModel homeViewModel = HomeViewModel();
   ScrollController scrollController = ScrollController();
+  late BuildContext buildContext;
 
   @override
   initState() {
     super.initState();
-    getLifecycle().addObserver(this);
-    canceler = HttpCanceler(this);
+    getLifecycle().addObserver(homeViewModel);
     scrollController.addListener(() {
-      context.read<HomeViewModel>().quickToTop =
+      buildContext.read<HomeViewModel>().quickToTop =
           scrollController.offset >= ScreenUtil.get().screenHeight;
     });
   }
@@ -45,13 +43,17 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
-    return Consumer<HomeViewModel>(
-      builder: (context, viewModel, child) {
-        _buildContext = context;
-        return Scaffold(
-          body: bodyContent(context, viewModel),
-          floatingActionButton: floatingActionButton(viewModel),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => homeViewModel)],
+      builder: (context, child) {
+        buildContext = context;
+        return Consumer<HomeViewModel>(
+          builder: (context, viewModel, child) {
+            return Scaffold(
+              body: bodyContent(context, viewModel),
+              floatingActionButton: floatingActionButton(viewModel),
+            );
+          },
         );
       },
     );
@@ -70,22 +72,12 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
   ///获取内容列表
   Future<HttpResult<ArticleEntity>> getContentList(
       BuildContext context, HomeViewModel viewModel, bool refresh) async {
-    viewModel.getArticleTopList(refresh, canceler);
-    return await viewModel.getArticleList(refresh, canceler);
+    return await viewModel.getArticleList(refresh);
   }
 
   ///内容控件
   Widget bodyContent(BuildContext context, HomeViewModel viewModel) {
-    EasyRefreshController controller = EasyRefreshController();
-
     return EasyRefresh(
-      controller: controller,
-      onRefresh: () async {
-        await getContentList(context, viewModel, true);
-      },
-      onLoad: () async {
-        await getContentList(context, viewModel, false);
-      },
       child: CustomScrollView(
         slivers: [
           const SliverAppBarWidget(),
@@ -94,6 +86,12 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
         ],
         controller: scrollController,
       ),
+      onRefresh: () async {
+        await getContentList(context, viewModel, true);
+      },
+      onLoad: () async {
+        await getContentList(context, viewModel, false);
+      },
     );
   }
 
@@ -102,16 +100,6 @@ class _MainHomePageState extends ZTLifecycleState<MainHomePage>
     return FloatingActionButton(
         child: Icon(viewModel.quickToTop ? Icons.arrow_upward : Icons.search),
         onPressed: () => actionFloatingButton(context, viewModel));
-  }
-
-  @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
-      /// 首帧绘制完成
-      /// 初始化数据
-      HomeViewModel viewModel = _buildContext.read<HomeViewModel>();
-      getContentList(context, viewModel, true);
-    }
   }
 
   @override
@@ -157,10 +145,10 @@ class _SliverAppBarWidgetState extends State<SliverAppBarWidget> {
 
       ///搜索按钮
       actions: [
-        shrinkAnimatedOpacity(IconButton(
+        /*shrinkAnimatedOpacity(IconButton(
             icon: const Icon(Icons.search),
             onPressed: () =>
-                RouterHelper.pushNamed(context, RouterConfig.searchPage))),
+                RouterHelper.pushNamed(context, RouterConfig.searchPage))),*/
       ],
     );
   }
@@ -200,15 +188,51 @@ class _SliverListWidgetState extends State<SliverListWidget> {
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         return ItemArticleWidget(
           article: widget.list[index],
-          onTapCollect: () {
-            actionCollect(index);
-          },
+          onTapCollect: () => actionCollect(index),
         );
       }, childCount: widget.list.length),
     );
   }
 
+  ///收藏/取消收藏 动作
   void actionCollect(int index) async {
+    ArticleEntity article = widget.list[index];
+
+    ///当前收藏状态
+    bool collected = article.collect != null && article.collect!;
+
+    if (collected) {
+      //取消收藏
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(S.of(context).tips_msg),
+              content: Text(S.of(context).collect_content),
+              actions: [
+                TextButton(
+                    onPressed: () => RouterHelper.pop(context, 0),
+                    child: Text(S.of(context).cancel)),
+                TextButton(
+                    onPressed: () => RouterHelper.pop(context, 1),
+                    child: Text(S.of(context).confirm))
+              ],
+            );
+          }).then((value) {
+        if (value == 1) {
+          collectLogic(index);
+        }
+      });
+    } else {
+      //收藏
+      collectLogic(index);
+    }
+  }
+
+  ///收藏/取消收藏 逻辑
+  void collectLogic(int index) async {
+    LoadingDialogHelper.showLoading(context);
+
     ArticleEntity article = widget.list[index];
 
     ///当前收藏状态
@@ -216,19 +240,18 @@ class _SliverListWidgetState extends State<SliverListWidget> {
 
     HomeViewModel viewModel = context.read<HomeViewModel>();
 
-    CollectModel model = CollectModel();
-    HttpResult result = await (collected
-        ? model.unCollectArticle(article.id)
-        : model.collectArticle(article.id));
-
-    if (result.success) {
-      article.collect = !collected;
-      widget.list[index] = article;
-      if (widget.isTop) {
-        viewModel.articleTopList = widget.list;
-      } else {
-        viewModel.articleList = widget.list;
+    CollectModel()
+        .collectOrCancelArticle(article.id, !collected)
+        .then((result) {
+      if (result.success) {
+        article.collect = !collected;
+        widget.list[index] = article;
+        if (widget.isTop) {
+          viewModel.articleTopList = widget.list;
+        } else {
+          viewModel.articleList = widget.list;
+        }
       }
-    }
+    }).whenComplete(() => LoadingDialogHelper.dismissLoading(context));
   }
 }

@@ -30,9 +30,13 @@ class MessageLookup extends MessageLookupByLibrary {
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "account_empty_tip":
             MessageLookupByLibrary.simpleMessage("Please enter an account"),
+        "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
         "clean_all": MessageLookupByLibrary.simpleMessage("Clear all"),
         "collect": MessageLookupByLibrary.simpleMessage("Collect"),
+        "collect_content": MessageLookupByLibrary.simpleMessage(
+            "Are you sure remove the collected content?"),
         "color_theme": MessageLookupByLibrary.simpleMessage("Color Theme"),
+        "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
         "dark_style": MessageLookupByLibrary.simpleMessage("Dark Mode"),
         "done": MessageLookupByLibrary.simpleMessage("Done"),
         "edit": MessageLookupByLibrary.simpleMessage("Edit"),
@@ -77,6 +81,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "tab_nav": MessageLookupByLibrary.simpleMessage("Navigation"),
         "tab_project": MessageLookupByLibrary.simpleMessage("Project"),
         "tab_tree": MessageLookupByLibrary.simpleMessage("System"),
+        "tips_msg": MessageLookupByLibrary.simpleMessage("Tips"),
         "topping": MessageLookupByLibrary.simpleMessage("Topping"),
         "user_name": MessageLookupByLibrary.simpleMessage("UserName"),
         "user_psw": MessageLookupByLibrary.simpleMessage("Password"),

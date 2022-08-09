@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_wan_android/core/net/cancel/http_canceler.dart';
 import 'package:flutter_wan_android/generated/l10n.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
@@ -22,7 +26,6 @@ class _MainKnowledgePageState extends State<MainKnowledgePage>
   Widget build(BuildContext context) {
     super.build(context);
     List<String> titleArray = [S.of(context).tab_tree, S.of(context).tab_nav];
-
     return DefaultTabController(
         length: titleArray.length,
         child: Scaffold(
@@ -61,9 +64,10 @@ class KnowledgeItemPage extends StatefulWidget {
   State<KnowledgeItemPage> createState() => _KnowledgeItemPageState();
 }
 
-class _KnowledgeItemPageState extends ZTLifecycleState<KnowledgeItemPage>
-    with AutomaticKeepAliveClientMixin, WidgetLifecycleObserver {
+class _KnowledgeItemPageState extends State<KnowledgeItemPage>
+    with AutomaticKeepAliveClientMixin, Lifecycle, LifecycleObserver {
   late BuildContext _buildContext;
+  late HttpCanceler httpCanceler;
 
   @override
   void initState() {
@@ -163,13 +167,15 @@ class _KnowledgeItemPageState extends ZTLifecycleState<KnowledgeItemPage>
   bool get wantKeepAlive => true;
 
   @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onInit) {
+      httpCanceler = HttpCanceler(owner);
+    } else if (state == LifecycleState.onCreate) {
       KnowledgeViewModel viewModel = _buildContext.read<KnowledgeViewModel>();
       if (widget.type == nav) {
-        viewModel.getNavList(owner);
+        viewModel.getNavList(httpCanceler);
       } else {
-        viewModel.getCategoryList(owner);
+        viewModel.getCategoryList(httpCanceler);
       }
     }
   }

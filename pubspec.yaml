@@ -50,7 +50,7 @@ dependencies:
   # 数据共享
   provider: ^6.0.3
   #刷新库
-  easy_refresh: ^3.0.0+2
+  easy_refresh: ^3.0.4+1
   #解析html
   flutter_html: ^2.2.1
   #网络请求cookie
@@ -58,6 +58,8 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   #国际化
   intl: ^0.17.0
+  #生命周期
+  flutter_lifecycle_aware: ^0.0.2
 
 # 开发依赖
 dev_dependencies:

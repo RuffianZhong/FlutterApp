@@ -1,7 +1,7 @@
 import 'package:flutter_wan_android/modules/book/model/study_entity.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../../../core/db/abs_dao.dart';
+import '../../../base/abs_dao.dart';
 
 ///StudyDao
 class StudyDao extends AbsDao {

@@ -29,9 +29,12 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "account_empty_tip": MessageLookupByLibrary.simpleMessage("请输入账号"),
+        "cancel": MessageLookupByLibrary.simpleMessage("取消"),
         "clean_all": MessageLookupByLibrary.simpleMessage("清除全部"),
         "collect": MessageLookupByLibrary.simpleMessage("收藏"),
+        "collect_content": MessageLookupByLibrary.simpleMessage("您确定要移除收藏内容吗？"),
         "color_theme": MessageLookupByLibrary.simpleMessage("彩色主题"),
+        "confirm": MessageLookupByLibrary.simpleMessage("确定"),
         "dark_style": MessageLookupByLibrary.simpleMessage("暗黑模式"),
         "done": MessageLookupByLibrary.simpleMessage("完成"),
         "edit": MessageLookupByLibrary.simpleMessage("编辑"),
@@ -66,6 +69,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "tab_nav": MessageLookupByLibrary.simpleMessage("导航"),
         "tab_project": MessageLookupByLibrary.simpleMessage("项目"),
         "tab_tree": MessageLookupByLibrary.simpleMessage("体系"),
+        "tips_msg": MessageLookupByLibrary.simpleMessage("提示"),
         "topping": MessageLookupByLibrary.simpleMessage("置顶"),
         "user_name": MessageLookupByLibrary.simpleMessage("用户名"),
         "user_psw": MessageLookupByLibrary.simpleMessage("密码"),

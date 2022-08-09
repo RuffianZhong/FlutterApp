@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_route_observer.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_wan_android/modules/main/view_model/locale_view_model.dart';
 import 'package:flutter_wan_android/modules/main/view_model/theme_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'config/router_config.dart';
-import 'core/lifecycle/zt_lifecycle.dart';
 import 'generated/l10n.dart';
 import 'modules/main/view/main_page.dart';
 
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
             supportedLocales: S.delegate.supportedLocales,
 
             /// 生命周期感知
-            navigatorObservers: [WidgetRouteObserver.routeObserver],
+            navigatorObservers: [LifecycleRouteObserver.routeObserver],
 
             ///路由表配置
             routes: RouterConfig.routes,

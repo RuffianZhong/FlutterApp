@@ -1,17 +1,18 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'canceler.dart';
-import '../../lifecycle/zt_lifecycle.dart';
 
 /// Http 消除器/取消管理者
 class HttpCanceler implements Canceler {
-  final WidgetLifecycleOwner lifecycleOwner; //生命周期感知对象
+  final LifecycleOwner lifecycleOwner; //生命周期感知对象
   final CancelToken cancelToken; //dio 取消Token
-  final WidgetLifecycleState lifecycleState; //widget生命周期状态
+  final LifecycleState lifecycleState; //widget生命周期状态
 
   HttpCanceler(this.lifecycleOwner,
-      {CancelToken? cancelToken, WidgetLifecycleState? lifecycleState})
+      {CancelToken? cancelToken, LifecycleState? lifecycleState})
       : cancelToken = cancelToken ?? CancelToken(),
-        lifecycleState = lifecycleState ?? WidgetLifecycleState.onDestroy;
+        lifecycleState = lifecycleState ?? LifecycleState.onDestroy;
 
   @override
   void cancel({reason}) {

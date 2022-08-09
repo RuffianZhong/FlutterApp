@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/core/net/cancel/zt_http_cancel.dart';
 import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
 import 'package:flutter_wan_android/modules/search/model/search_model.dart';
 
-
 ///SearchViewModel
-class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
+class SearchViewModel extends ChangeNotifier with LifecycleObserver {
+  late HttpCanceler httpCanceler;
   SearchModel model = SearchModel();
 
   ///编辑数据模式
@@ -73,8 +75,8 @@ class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   }
 
   ///搜索内容
-  void getContentFromServer(String key, WidgetLifecycleOwner lifecycleOwner) {
-    model.getContentFromServer(key, HttpCanceler(lifecycleOwner)).then((value) {
+  void getContentFromServer(String key) {
+    model.getContentFromServer(key, httpCanceler).then((value) {
       if (value.success) {
         articleList = value.list!;
       }
@@ -82,8 +84,16 @@ class SearchViewModel extends ChangeNotifier with WidgetLifecycleObserver {
   }
 
   @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onDestroy) {
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onInit) {
+      httpCanceler = HttpCanceler(owner);
+    } else if (state == LifecycleState.onCreate) {
+      ///初始化本地数据
+      getSearchKeyFromLocal();
+
+      ///初始化服务器数据
+      getHotKeyFromServer();
+    } else if (state == LifecycleState.onDestroy) {
       model.close();
     }
   }

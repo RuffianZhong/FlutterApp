@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/article/view_model/article_details_view_model.dart';
@@ -17,8 +20,8 @@ class ArticleDetailsPage extends StatefulWidget {
   State<ArticleDetailsPage> createState() => _ArticleDetailsPageState();
 }
 
-class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
-    with WidgetLifecycleObserver {
+class _ArticleDetailsPageState extends State<ArticleDetailsPage>
+    with Lifecycle, LifecycleObserver {
   ///滚动进度
   double scrollProgress = 0.0;
 
@@ -178,8 +181,8 @@ class _ArticleDetailsPageState extends ZTLifecycleState<ArticleDetailsPage>
   }
 
   @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onCreate) {
       ///获取参数
       ArticleEntity? entity = RouterHelper.argumentsT<ArticleEntity>(context);
 

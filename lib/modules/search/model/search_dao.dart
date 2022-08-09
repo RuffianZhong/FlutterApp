@@ -1,4 +1,4 @@
-import 'package:flutter_wan_android/core/db/abs_dao.dart';
+import 'package:flutter_wan_android/base/abs_dao.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'search_entity.dart';

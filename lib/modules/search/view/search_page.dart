@@ -1,11 +1,14 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
+import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
 import 'package:flutter_wan_android/modules/article/widget/item_article_widget.dart';
+import 'package:flutter_wan_android/modules/collect/model/collect_model.dart';
 import 'package:flutter_wan_android/modules/search/model/search_entity.dart';
+import 'package:flutter_wan_android/widget/loading_dialog_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../../generated/l10n.dart';
@@ -20,45 +23,31 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends ZTLifecycleState<SearchPage>
-    with WidgetLifecycleObserver {
+class _SearchPageState extends State<SearchPage> with Lifecycle {
   ///输入框Controller
   TextEditingController editingController = TextEditingController();
 
-  late BuildContext _buildContext;
+  final SearchViewModel searchViewModel = SearchViewModel();
 
   @override
   void initState() {
     super.initState();
-    getLifecycle().addObserver(SearchViewModel());
-    getLifecycle().addObserver(this);
+    getLifecycle().addObserver(searchViewModel);
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => SearchViewModel())
+          ChangeNotifierProvider(create: (context) => searchViewModel)
         ],
         child: Consumer<SearchViewModel>(builder: (context, viewModel, child) {
-          _buildContext = context;
           return Scaffold(
               appBar: appBar(context, viewModel),
               body: viewModel.showSearchUI
                   ? searchWidget(context, viewModel)
                   : resultWidget(context, viewModel));
         }));
-  }
-
-  @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
-      ///初始化本地数据
-      _buildContext.read<SearchViewModel>().getSearchKeyFromLocal();
-
-      ///初始化服务器数据
-      _buildContext.read<SearchViewModel>().getHotKeyFromServer();
-    }
   }
 
   ///执行搜索逻辑
@@ -83,7 +72,7 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
       viewModel.getSearchKeyFromLocal();
 
       ///网络数据请求
-      viewModel.getContentFromServer(submitValue, this);
+      viewModel.getContentFromServer(submitValue);
     }
   }
 
@@ -105,6 +94,61 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
     }
     viewModel.model.deleteLocalData(id: id);
     viewModel.getSearchKeyFromLocal();
+  }
+
+  ///收藏/取消收藏 动作
+  void actionCollect(int index, SearchViewModel viewModel) async {
+    ArticleEntity article = viewModel.articleList[index];
+
+    ///当前收藏状态
+    bool collected = article.collect != null && article.collect!;
+
+    if (collected) {
+      //取消收藏
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(S.of(context).tips_msg),
+              content: Text(S.of(context).collect_content),
+              actions: [
+                TextButton(
+                    onPressed: () => RouterHelper.pop(context, 0),
+                    child: Text(S.of(context).cancel)),
+                TextButton(
+                    onPressed: () => RouterHelper.pop(context, 1),
+                    child: Text(S.of(context).confirm))
+              ],
+            );
+          }).then((value) {
+        if (value == 1) {
+          collectLogic(index, viewModel);
+        }
+      });
+    } else {
+      //收藏
+      collectLogic(index, viewModel);
+    }
+  }
+
+  ///收藏/取消收藏 逻辑
+  void collectLogic(int index, SearchViewModel viewModel) async {
+    LoadingDialogHelper.showLoading(context);
+
+    ArticleEntity article = viewModel.articleList[index];
+
+    ///当前收藏状态
+    bool collected = article.collect != null && article.collect!;
+
+    CollectModel()
+        .collectOrCancelArticle(article.id, !collected)
+        .then((result) {
+      if (result.success) {
+        article.collect = !collected;
+        viewModel.articleList[index] = article;
+        viewModel.articleList = viewModel.articleList;
+      }
+    }).whenComplete(() => LoadingDialogHelper.dismissLoading(context));
   }
 
   ///导航栏
@@ -188,7 +232,10 @@ class _SearchPageState extends ZTLifecycleState<SearchPage>
                 RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
                     arguments: viewModel.articleList[index]);
               },
-              child: ItemArticleWidget(article: viewModel.articleList[index]));
+              child: ItemArticleWidget(
+                article: viewModel.articleList[index],
+                onTapCollect: () => actionCollect(index, viewModel),
+              ));
         },
         itemCount: viewModel.articleList.length,
       ),

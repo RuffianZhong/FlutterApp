@@ -40,5 +40,9 @@
   "net_error": "Network error",
   "tab_tree": "System",
   "tab_nav": "Navigation",
-  "tab_book_course": "Book tutorial"
+  "tab_book_course": "Book tutorial",
+  "tips_msg": "Tips",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "collect_content": "Are you sure remove the collected content?"
 }

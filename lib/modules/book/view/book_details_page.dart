@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_aware/lifecycle.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/config/router_config.dart';
-import 'package:flutter_wan_android/core/lifecycle/zt_lifecycle.dart';
 import 'package:flutter_wan_android/helper/image_helper.dart';
 import 'package:flutter_wan_android/helper/router_helper.dart';
 import 'package:flutter_wan_android/modules/article/model/article_entity.dart';
@@ -20,17 +23,18 @@ class BookDetailsPage extends StatefulWidget {
   State<BookDetailsPage> createState() => _BookDetailsPageState();
 }
 
-class _BookDetailsPageState extends ZTLifecycleState<BookDetailsPage>
-    with WidgetLifecycleObserver {
+class _BookDetailsPageState extends State<BookDetailsPage>
+    with Lifecycle, LifecycleObserver {
   ///教程实体类
   late BookEntity book;
   late BuildContext _buildContext;
+  final BookDetailsViewModel bookDetailsViewModel = BookDetailsViewModel();
 
   @override
   initState() {
     super.initState();
     getLifecycle().addObserver(this);
-    getLifecycle().addObserver(BookDetailsViewModel());
+    getLifecycle().addObserver(bookDetailsViewModel);
   }
 
   @override
@@ -38,7 +42,7 @@ class _BookDetailsPageState extends ZTLifecycleState<BookDetailsPage>
     book = RouterHelper.argumentsT(context);
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => BookDetailsViewModel())
+        ChangeNotifierProvider(create: (context) => bookDetailsViewModel)
       ],
       child: Consumer<BookDetailsViewModel>(
         builder: (context, viewModel, child) {
@@ -59,9 +63,9 @@ class _BookDetailsPageState extends ZTLifecycleState<BookDetailsPage>
   }
 
   @override
-  void onStateChanged(WidgetLifecycleOwner owner, WidgetLifecycleState state) {
-    if (state == WidgetLifecycleState.onCreate) {
-      _buildContext.read<BookDetailsViewModel>().initData(book.id, owner);
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onCreate) {
+      _buildContext.read<BookDetailsViewModel>().initData(book.id);
     }
   }
 }

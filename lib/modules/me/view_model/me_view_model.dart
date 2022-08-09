@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_wan_android/common/global_value.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_observer.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_owner.dart';
+import 'package:flutter_lifecycle_aware/lifecycle_state.dart';
 import 'package:flutter_wan_android/modules/account/model/user_entity.dart';
 import 'package:flutter_wan_android/modules/main/view_model/locale_view_model.dart';
 import 'package:flutter_wan_android/modules/main/view_model/theme_view_model.dart';
@@ -8,7 +10,7 @@ import 'package:provider/provider.dart';
 import '../../account/model/account_model.dart';
 
 /// me页面的ViewModel
-class MeViewModel extends ChangeNotifier {
+class MeViewModel extends ChangeNotifier with LifecycleObserver {
   late AccountModel model;
 
   MeViewModel() {
@@ -68,7 +70,6 @@ class MeViewModel extends ChangeNotifier {
   ///初始化用户信息
   void initUserData() async {
     isLogin = await model.isLogin();
-
     if (isLogin) {
       userEntity = await model.getUser();
     }
@@ -84,5 +85,16 @@ class MeViewModel extends ChangeNotifier {
     ThemeViewModel viewModel = context.read<ThemeViewModel>();
     themeIndex = viewModel.themeIndex;
     darkMode = viewModel.darkMode;
+  }
+
+  @override
+  void onLifecycleChanged(LifecycleOwner owner, LifecycleState state) {
+    if (state == LifecycleState.onResume) {
+      /// 首帧绘制完成
+      /// 初始化数据
+      initLocalData(owner.getStateful().context);
+      initThemeData(owner.getStateful().context);
+      initUserData();
+    }
   }
 }
