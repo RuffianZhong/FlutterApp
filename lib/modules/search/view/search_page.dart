@@ -204,41 +204,19 @@ class _SearchPageState extends State<SearchPage> with Lifecycle {
 
   ///结果界面
   Widget resultWidget(BuildContext context, SearchViewModel viewModel) {
-    EasyRefreshController controller = EasyRefreshController();
-
-    return EasyRefresh(
-      controller: controller,
-      footer: ClassicFooter(),
-      onRefresh: () async {
-        await Future.delayed(Duration(seconds: 2), () {
-          //controller.callRefresh();
-          // controller.finishRefresh();
-          return IndicatorResult.success;
-        });
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return GestureDetector(
+            onTap: () {
+              RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
+                  arguments: viewModel.articleList[index]);
+            },
+            child: ItemArticleWidget(
+              article: viewModel.articleList[index],
+              onTapCollect: () => actionCollect(index, viewModel),
+            ));
       },
-      onLoad: () async {
-        await Future.delayed(Duration(seconds: 2), () {
-          //   controller.callLoad();
-          //  controller.finishLoad();
-          return IndicatorResult.noMore;
-        });
-      },
-
-      ///return IndicatorResult.success;
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return GestureDetector(
-              onTap: () {
-                RouterHelper.pushNamed(context, RouterConfig.articleDetailsPage,
-                    arguments: viewModel.articleList[index]);
-              },
-              child: ItemArticleWidget(
-                article: viewModel.articleList[index],
-                onTapCollect: () => actionCollect(index, viewModel),
-              ));
-        },
-        itemCount: viewModel.articleList.length,
-      ),
+      itemCount: viewModel.articleList.length,
     );
   }
 

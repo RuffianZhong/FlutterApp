@@ -103,8 +103,6 @@ class _TabBarViewItemPageState extends State<TabBarViewItemPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    EasyRefreshController controller = EasyRefreshController();
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ProjectItemViewModel())
@@ -113,12 +111,11 @@ class _TabBarViewItemPageState extends State<TabBarViewItemPage>
         builder: (context, viewModel, child) {
           _buildContext = context;
           return EasyRefresh(
-            controller: controller,
             onRefresh: () async {
-              getContentList(context, viewModel, true);
+              await getContentList(context, viewModel, true);
             },
             onLoad: () async {
-              getContentList(context, viewModel, false);
+              await getContentList(context, viewModel, false);
             },
             child: ListView.builder(
               itemBuilder: (context, index) {

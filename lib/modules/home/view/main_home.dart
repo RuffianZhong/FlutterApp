@@ -29,6 +29,7 @@ class _MainHomePageState extends State<MainHomePage>
   final HomeViewModel homeViewModel = HomeViewModel();
   ScrollController scrollController = ScrollController();
   late BuildContext buildContext;
+  late EasyRefreshController _controller;
 
   @override
   initState() {
@@ -38,6 +39,10 @@ class _MainHomePageState extends State<MainHomePage>
       buildContext.read<HomeViewModel>().quickToTop =
           scrollController.offset >= ScreenUtil.get().screenHeight;
     });
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
   }
 
   @override
@@ -77,15 +82,18 @@ class _MainHomePageState extends State<MainHomePage>
 
   ///内容控件
   Widget bodyContent(BuildContext context, HomeViewModel viewModel) {
-    return EasyRefresh(
-      child: CustomScrollView(
-        slivers: [
-          const SliverAppBarWidget(),
-          SliverListWidget(viewModel.articleTopList, true),
-          SliverListWidget(viewModel.articleList, false),
-        ],
-        controller: scrollController,
-      ),
+    return EasyRefresh.builder(
+      childBuilder: (context, physics) {
+        return CustomScrollView(
+          physics: physics,
+          slivers: [
+            const SliverAppBarWidget(),
+            SliverListWidget(viewModel.articleTopList, true),
+            SliverListWidget(viewModel.articleList, false),
+          ],
+          controller: scrollController,
+        );
+      },
       onRefresh: () async {
         await getContentList(context, viewModel, true);
       },

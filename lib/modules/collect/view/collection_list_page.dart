@@ -30,10 +30,16 @@ class _CollectionListPageState extends State<CollectionListPage>
   late BuildContext _buildContext;
   late HttpCanceler httpCanceler;
 
+  late EasyRefreshController _controller;
+
   @override
   void initState() {
     super.initState();
     getLifecycle().addObserver(this);
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
   }
 
   @override
@@ -66,11 +72,24 @@ class _CollectionListPageState extends State<CollectionListPage>
     return Consumer<CollectionListViewModel>(
       builder: (context, viewModel, child) {
         return EasyRefresh(
+          controller: _controller,
           onRefresh: () async {
             await getContentList(context, viewModel, true);
+
+            _controller.finishRefresh();
+            _controller.resetFooter();
           },
           onLoad: () async {
-            await getContentList(context, viewModel, false);
+            HttpResult<ArticleEntity> result =
+                await getContentList(context, viewModel, false);
+
+            bool noMore = false;
+            if (result.list != null && result.list!.isEmpty) {
+              noMore = true;
+            }
+
+            _controller.finishLoad(
+                noMore ? IndicatorResult.noMore : IndicatorResult.success);
           },
           child: ListView.builder(
             itemBuilder: (context, index) {
@@ -168,6 +187,8 @@ class _CollectionListPageState extends State<CollectionListPage>
     } else if (state == LifecycleState.onStart) {
       getContentList(
           _buildContext, _buildContext.read<CollectionListViewModel>(), true);
+    } else if (state == LifecycleState.onDestroy) {
+      _controller.dispose();
     }
   }
 }
