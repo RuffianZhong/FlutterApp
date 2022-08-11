@@ -1,22 +1,23 @@
 使用 flutter 实现的 《玩Android》客户端
 
 ### 功能效果图
-<img src="assets/screenshot/home.png" width="248px" height="441px"/>
-<img src="/assets/screenshot/search.png" width="248px" height="441px"/>
-<img src="assets/screenshot/project.png" width="248px" height="441px"/>
-
-<img src="assets/screenshot/book.png" width="248px" height="441px"/>
-<img src="/assets/screenshot/book_details.png" width="248px" height="441px"/>
-<img src="assets/screenshot/article_details.png" width="248px" height="441px"/>
-
-<img src="/assets/screenshot/me.png" width="248px" height="441px"/>
-<img src="assets/screenshot/login.png" width="248px" height="441px"/>
-<img src="/assets/screenshot/register.png" width="248px" height="441px"/>
-
-<img src="/assets/screenshot/home_dark.png" width="248px" height="441px"/>
-<img src="assets/screenshot/knowledge_dark.png" width="248px" height="441px"/>
-<img src="/assets/screenshot/category_dark.png" width="248px" height="441px"/>
-
+| --- | --- | --- |
+| <img src="assets/screenshot/home.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/search.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/project.png" width="248px" height="441px"/>
+|
+| <img src="assets/screenshot/book.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/book_details.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/article_details.png" width="248px" height="441px"/>
+|
+| <img src="assets/screenshot/me.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/login.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/register.png" width="248px" height="441px"/>
+|
+| <img src="assets/screenshot/home_dark.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/knowledge_dark.png" width="248px" height="441px"/>
+| <img src="assets/screenshot/category_dark.png" width="248px" height="441px"/>
+|
 
 ### 项目结构
 ```
@@ -35,20 +36,20 @@
 ### 业务模块结构
 ```
 |--modules
-     |-- account (账户模块)
+    |-- article (文章模块)
+    |-- search (搜索模块)
+    |-- collect (收藏模块)
+    |-- ...... (其他模块)
+    |-- account (账户模块)
         |-- model (数据管理model，实体类entity)
-             |-- account_model (登录，注册，本地数据)
-             |-- user_entity 
-         |-- view 
-             |-- login_page 
-             |-- register_page
-         |-- view_model
-             |-- login_view_model 
-             |-- register_view_model 
-     |-- article (文章模块)
-     |-- search (搜索模块)
-     |-- collect (收藏模块)
-     |-- ...... (其他模块)
+              |-- account_model (登录，注册，本地数据)
+              |-- user_entity 
+        |-- view 
+              |-- login_page 
+              |-- register_page
+        |-- view_model
+              |-- login_view_model 
+              |-- register_view_model 
 ```
 
 
