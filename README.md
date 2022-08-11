@@ -2,7 +2,7 @@
 这是一个使用 flutter 实现的应用程序，叫做 玩Android 
 
 ### 功能效果图
-|![](assets/screenshot/home.png)｜![](assets/screenshot/project.png)｜![](assets/screenshot/book.png)|![](assets/screenshot/knowledge.png)｜![](assets/screenshot/me.png)｜
+|![](assets/screenshot/home.png){:height="736px" width="414px"}｜![](assets/screenshot/project.png)｜![](assets/screenshot/book.png)|![](assets/screenshot/knowledge.png)｜![](assets/screenshot/me.png)｜
 |![](assets/screenshot/search.png)｜![](assets/screenshot/article_details.png)｜![](assets/screenshot/book_details.png)|![](assets/screenshot/login.png)｜![](assets/screenshot/register.png)｜
 |:---:|:---:|:---:|:---:|:---:|
 
