@@ -2,22 +2,22 @@
 这是一个使用 flutter 实现的应用程序，叫做 玩Android 
 
 ### 功能效果图
-|![](assets/screenshot/home.png){:height="736px" width="414px"}｜![](assets/screenshot/project.png)｜![](assets/screenshot/book.png)|![](assets/screenshot/knowledge.png)｜![](assets/screenshot/me.png)｜
+|<img src="assets/screenshot/home.png" width="248px" height="441px"/>｜<img src="/assets/screenshot/project.png" width="248px" height="441px"/>｜<img src="assets/screenshot/book.png" width="248px" height="441px"/>|<img src="assets/screenshot/knowledge.png" width="248px" height="441px"/>｜<img src="assets/screenshot/me.png" width="248px" height="441px"/>｜
 |![](assets/screenshot/search.png)｜![](assets/screenshot/article_details.png)｜![](assets/screenshot/book_details.png)|![](assets/screenshot/login.png)｜![](assets/screenshot/register.png)｜
 |:---:|:---:|:---:|:---:|:---:|
 
 
 ### 项目结构
->- |--lib
->-     |-- base (基类)
->-     |-- common (常用类，例如常量)
->-     |-- config (配置信息)
->-     |-- core (核心代码，例如：网络)
->-     |-- helper (功能辅助类)
->-     |-- I10n (国际化文本)
->-     |-- modules (业务模块：账户模块，文章模块，搜索模块，收藏模块,,,)
->-     |-- utils (工具类)
->-     |-- widget (全局通用控件)
+>|--lib
+    |-- base (基类)
+    |-- common (常用类，例如常量)
+    |-- config (配置信息)
+    |-- core (核心代码，例如：网络)
+    |-- helper (功能辅助类)
+    |-- I10n (国际化文本)
+    |-- modules (业务模块：账户模块，文章模块，搜索模块，收藏模块,,,)
+    |-- utils (工具类)
+    |-- widget (全局通用控件)
 
 
 ### 业务模块结构
