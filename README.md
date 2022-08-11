@@ -1,6 +1,7 @@
 使用 flutter 实现的 《玩Android》客户端
 
 ### 功能效果图
+|  |  |  |
 | --- | --- | --- |
 | <img src="assets/screenshot/home.png" width="248px" height="441px"/>
 | <img src="assets/screenshot/search.png" width="248px" height="441px"/>
@@ -41,13 +42,13 @@
     |-- collect (收藏模块)
     |-- ...... (其他模块)
     |-- account (账户模块)
-        |-- model (数据管理model，实体类entity)
+         |-- model (数据管理model，实体类entity)
               |-- account_model (登录，注册，本地数据)
               |-- user_entity 
-        |-- view 
+         |-- view 
               |-- login_page 
               |-- register_page
-        |-- view_model
+         |-- view_model
               |-- login_view_model 
               |-- register_view_model 
 ```
