@@ -3,22 +3,10 @@
 ### 功能效果图
 |  |  |  |
 | --- | --- | --- |
-| <img src="assets/screenshot/home.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/search.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/project.png" width="248px" height="441px"/>
-|
-| <img src="assets/screenshot/book.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/book_details.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/article_details.png" width="248px" height="441px"/>
-|
-| <img src="assets/screenshot/me.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/login.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/register.png" width="248px" height="441px"/>
-|
-| <img src="assets/screenshot/home_dark.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/knowledge_dark.png" width="248px" height="441px"/>
-| <img src="assets/screenshot/category_dark.png" width="248px" height="441px"/>
-|
+| <img src="assets/screenshot/home.png" width="248px" height="441px"/> | <img src="assets/screenshot/search.png" width="248px" height="441px"/>| <img src="assets/screenshot/project.png" width="248px" height="441px"/> |
+| <img src="assets/screenshot/book.png" width="248px" height="441px"/> | <img src="assets/screenshot/book_details.png" width="248px" height="441px"/> | <img src="assets/screenshot/article_details.png" width="248px" height="441px"/> |
+| <img src="assets/screenshot/me.png" width="248px" height="441px"/> | <img src="assets/screenshot/login.png" width="248px" height="441px"/> | <img src="assets/screenshot/register.png" width="248px" height="441px"/> |
+| <img src="assets/screenshot/home_dark.png" width="248px" height="441px"/> | <img src="assets/screenshot/knowledge_dark.png" width="248px" height="441px"/> | <img src="assets/screenshot/category_dark.png" width="248px" height="441px"/> |
 
 ### 项目结构
 ```
