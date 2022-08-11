@@ -2,13 +2,15 @@
 这是一个使用 flutter 实现的应用程序，叫做 玩Android 
 
 ### 功能效果图
-|<img src="assets/screenshot/home.png" width="248px" height="441px"/>｜<img src="/assets/screenshot/project.png" width="248px" height="441px"/>｜<img src="assets/screenshot/book.png" width="248px" height="441px"/>|<img src="assets/screenshot/knowledge.png" width="248px" height="441px"/>｜<img src="assets/screenshot/me.png" width="248px" height="441px"/>｜
-|![](assets/screenshot/search.png)｜![](assets/screenshot/article_details.png)｜![](assets/screenshot/book_details.png)|![](assets/screenshot/login.png)｜![](assets/screenshot/register.png)｜
-|:---:|:---:|:---:|:---:|:---:|
-
+|:---:|:---:|
+|<img src="assets/screenshot/home.png" width="248px" height="441px"/>｜<img src="/assets/screenshot/search.png" width="248px" height="441px"/>｜
+|<img src="assets/screenshot/book.png" width="248px" height="441px"/>｜<img src="/assets/screenshot/book_details.png" width="248px" height="441px"/>｜
+|<img src="assets/screenshot/project.png" width="248px" height="441px"/> |<img src="assets/screenshot/article_details.png" width="248px" height="441px"/> |
+|<img src="assets/screenshot/knowledge.png" width="248px" height="441px"/>｜<img src="/assets/screenshot/me.png" width="248px" height="441px"/>｜
+|<img src="assets/screenshot/login.png" width="248px" height="441px"/>｜<img src="/assets/screenshot/register.png" width="248px" height="441px"/>｜
 
 ### 项目结构
->|--lib
+  |--lib
     |-- base (基类)
     |-- common (常用类，例如常量)
     |-- config (配置信息)
